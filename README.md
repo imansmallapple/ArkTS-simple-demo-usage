@@ -30,3 +30,6 @@
           })
 ```
 ### Effect:
+<div>
+        <img src="images/alertDialogWindow.png">
+</div>
