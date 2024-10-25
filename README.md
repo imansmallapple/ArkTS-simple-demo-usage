@@ -218,6 +218,8 @@ class BasicDataSource implements IDataSource {
 ```
 ### 2. 实现自己的数据源类，下面的例子作为参考 但是我提供了更通用的模板在下面
 > 需要按需调整完善该类的实现方法
+### Used Icons
+[music.png](icons/music.png),[video.png](icons/video.png),[map.png](icons/map.png)
 ```typescript
 class MyDataSource extends BasicDataSource {
   private dataArray: Array<{
@@ -277,8 +279,7 @@ class MyDataSource extends BasicDataSource {
   }
 }
 ```
-### Usage
-创建数据源实例并为其添加数据
+### 3. 创建数据源实例并为其添加数据
 ```typescript
 @Component
 export struct BundleInfo {
@@ -327,3 +328,6 @@ export struct BundleInfo {
   }
 }
 ```
+<div>
+        <img src="screenshots/lazy_list.png">
+</div>
