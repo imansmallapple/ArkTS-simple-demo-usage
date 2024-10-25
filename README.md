@@ -11,6 +11,7 @@
 <div>
         <img src="screenshots/alertDialogWindow.png">
 </div>
+
 ```typescript
         Button('Show alertDialog Window')
           .onClick(() => {
