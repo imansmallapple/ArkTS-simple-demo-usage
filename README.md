@@ -4,7 +4,7 @@
 2. [Topbar template](#topbar-template)
 3. [Logger template](#logger-template)
 4. [LazyForEach Usage](#lazyforeach-usage)
-   
+5. [UserInfo Template](#userinfo-template)
 
 ## AlertDialog Window
 ### Effect:
@@ -340,3 +340,63 @@ export struct BundleInfo {
 }
 ```
 
+## UserInfo Template
+### Effect:
+<div>
+        <img src="screenshots/userInfo.png">
+</div>
+
+使用前要先在组件内声明UI变量:
+```typescript
+  @State name: string = ''
+  @State password: string = ''
+```
+
+```typescript
+    Column() {
+
+
+      Row() {
+        Text('username:')
+          .margin(10)
+          .fontSize(18)
+          .width('25%')
+          .textAlign(TextAlign.End)
+
+        TextInput({ placeholder: 'xxxxxxx' })
+          .id('nameInput')
+          .margin(10)
+          .width('55%')
+          .fontSize(20)
+          .maxLength(20)
+          .fontWeight(FontWeight.Bold)
+          .placeholderFont({ size: 16, weight: FontWeight.Normal })
+          .onChange((value: string) => {
+            this.name = value
+          })
+      }
+      .padding({ left: 5 })
+
+      Row() {
+        Text('password:')
+          .margin(10)
+          .fontSize(18)
+          .width('25%')
+          .textAlign(TextAlign.End)
+
+        TextInput({ placeholder: 'xxxxxxx' })
+          .id('passwordInput')
+          .margin(10)
+          .width('55%')
+          .fontSize(20)
+          .maxLength(20)
+          .type(InputType.Password)
+          .fontWeight(FontWeight.Bold)
+          .placeholderFont({ size: 16, weight: FontWeight.Normal })
+          .onChange((value: string) => {
+            this.password = value
+          })
+      }
+      .padding({ left: 5 })
+    }
+```
