@@ -67,7 +67,7 @@
   }
 ```
 ### Used Icons:
-
+[left.png](icons/left.png)
 ### Effect:
 <div>
         <img src="screenshots/topbar_classic_template.png">
