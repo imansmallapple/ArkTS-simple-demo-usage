@@ -1,9 +1,9 @@
 # ArkTS-simple-demo-usage
 
-1. [AlertDialog Window](##alertdialog-window)
-2. [Topbar template](##topbar-template)
-3. [Logger template](##logger-template)
-4. [LazyForEach Usage](##lazyforeach-usage)
+1. [AlertDialog Window](#alertdialog-window)
+2. [Topbar template](#topbar-template)
+3. [Logger template](#logger-template)
+4. [LazyForEach Usage](#lazyforeach-usage)
    
 
 ## AlertDialog Window
