@@ -7,6 +7,10 @@
    
 
 ## AlertDialog Window
+### Effect:
+<div>
+        <img src="screenshots/alertDialogWindow.png">
+</div>
 ```typescript
         Button('Show alertDialog Window')
           .onClick(() => {
@@ -36,12 +40,14 @@
               })
           })
 ```
-### Effect:
-<div>
-        <img src="screenshots/alertDialogWindow.png">
-</div>
+
 
 ## Topbar template
+### Effect:
+<div>
+        <img src="screenshots/topbar_classic_template.png">
+</div>
+
 ```typescript
   build() {
     Row() {
@@ -75,12 +81,14 @@
 ```
 ### Used Icons:
 [left.png](icons/left.png)
-### Effect:
-<div>
-        <img src="screenshots/topbar_classic_template.png">
-</div>
+
 
 ## Logger Template
+### Effect:
+<div>
+        <img src="screenshots/logger_usage.png">
+</div>
+
 首先要创建一个文件 `ets/model/Logger.ets`
 ```typescript
 /*
@@ -142,11 +150,13 @@ Logger.info(TAG, `Logger info information`)
 Logger.info(TAG, `Logger error information`)
 Logger.info(TAG, `Logger warning information`)
 ```
-<div>
-        <img src="screenshots/logger_usage.png">
-</div>
 
 ## LazyForEach Usage
+### Effect:
+<div>
+        <img src="screenshots/lazy_list.png">
+</div>
+
 ### 1. 实现IDataSource接口
 > **Note:** 照着拷贝
 ```typescript
@@ -328,6 +338,4 @@ export struct BundleInfo {
   }
 }
 ```
-<div>
-        <img src="screenshots/lazy_list.png">
-</div>
+
