@@ -142,3 +142,6 @@ Logger.info(TAG, `Logger info information`)
 Logger.info(TAG, `Logger error information`)
 Logger.info(TAG, `Logger warning information`)
 ```
+<div>
+        <img src="screenshots/logger_usage.png">
+</div>
