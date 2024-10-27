@@ -1,87 +1,51 @@
-# ArkTS-simple-demo-usage
+# Functions
 
-1. [AlertDialog Window](#alertdialog-window)
+1. [横竖屏控制变量island](#横竖屏控制变量island)
 2. [Topbar template](#topbar-template)
 3. [Logger template](#logger-template)
 4. [LazyForEach Usage](#lazyforeach-usage)
 5. [UserInfo Template](#userinfo-template)
 
-## AlertDialog Window
+## 横竖屏控制变量island
 ### Effect:
-<div>
-        <img src="screenshots/alertDialogWindow.png">
-</div>
+设备窗口为竖屏的时候isLand状态变量值为False，为横屏的时候为True
 
+### 第一步：import相关库  
 ```typescript
-        Button('Show alertDialog Window')
-          .onClick(() => {
-            AlertDialog.show(
-              {
-                title: 'AlertDialog title',
-                message: 'Message to be shown',
-                primaryButton: {
-                  value: 'Confirm',
-                  action: () => {
-                    // todo: callback function when first button clicked
-                    // router.pushUrl({
-                    //   url: this.url,
-                    // })
-                  }
-                },
-                secondaryButton: {
-                  value: 'Cancel',
-                  action: () => {
-                    // todo: callback function when second button clicked
-                    // console.log('cancel click')
-                  }
-                },
-                cancel: () => {
-                  // todo: callback function when window close
-                }
-              })
-          })
+import mediaQuery from '@ohos.mediaquery'
 ```
 
-
-## Topbar template
-### Effect:
-<div>
-        <img src="screenshots/topbar_classic_template.png">
-</div>
-
+### 第二步：定义媒体查询监听器以及isLand状态变量
 ```typescript
-  build() {
-    Row() {
-      Row() {
-        Row() {
-          Image($r('app.media.left'))
-            .objectFit(ImageFit.Contain)
-            .width('10%')
-          Text("back")
-            .fontSize(18)
-            .textAlign(TextAlign.End)
-            .fontColor(Color.White)
-        }
-        .id('back')
-        .layoutWeight(1)
+private listener = mediaQuery.matchMediaSync('screen and (min-aspect-ratio: 1.5) or (orientation: landscape)')
+@State isLand: boolean = false
+```
 
-
-        Text('title')
-          .fontSize(18)
-          .fontColor(Color.White)
-          .textAlign(TextAlign.Start)
-          .margin({ right: '5%' })
-      }
-      .height('8%')
-      .width('100%')
-      .padding({ left: 15 })
-      .backgroundColor('#0D9FFB')
-      .constraintSize({ minHeight: 50 })
+### 第三步：在组件内声明onLand方法
+```typescript 
+  onLand(mediaQueryResult) {
+    // Logger.info(`${TAG} onLand: mediaQueryResult.matches=${mediaQueryResult.matches}`)
+    if (mediaQueryResult.matches) {
+    //  Logger.info('isLand', `True`)
+      this.isLand = true
+    } else {
+    //  Logger.info('isLand', `False`)
+      this.isLand = false
     }
   }
 ```
-### Used Icons:
-[left.png](icons/left.png)
+
+### 第四步：组件生命周期方法 aboutToAppear 中绑定 change 事件
+```typescript
+aboutToAppear() {
+    this.listener.on('change', this.onLand.bind(this))
+}
+```
+
+> 当屏幕的方向或比例变化时，listener 会触发 change 事件，调用 onLand 方法。
+
+> onLand 会将 mediaQueryResult.matches 的值更新到 isLand，从而控制页面是横屏显示（isLand = true）还是竖屏显示（isLand = false）。
+
 
 
 ## Logger Template
