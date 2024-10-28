@@ -1,11 +1,13 @@
 # ArkTS-simple-demo-usage
 
 1. [AlertDialog Window](#alertdialog-window)
-2. [Topbar template](#topbar-template)
-3. [Logger template](#logger-template)
-4. [LazyForEach Usage](#lazyforeach-usage)
-5. [UserInfo Template](#userinfo-template)
+2. [CustomDialog](#customdialog)
+3. [Topbar template](#topbar-template)
+4. [Logger template](#logger-template)
+5. [LazyForEach Usage](#lazyforeach-usage)
+6. [UserInfo Template](#userinfo-template)
 
+   
 ## AlertDialog Window
 ### Effect:
 <div>
@@ -42,6 +44,89 @@
           })
 ```
 
+
+## CustomDialog
+
+### Effect
+<div>
+        <img src="screenshots/customDialog_1.png">
+</div>
+
+### 第一步： 创建自定义弹窗
+
+```typescript
+@CustomDialog
+struct customDialogExample{
+  cancel?: () => void
+  confirm?: () => void
+  controller: CustomDialogController
+
+  build(){
+    Column() {
+      Text('我是内容')
+        .fontSize(20)
+        .margin({ top: 10, bottom: 10 })
+      Flex({ justifyContent: FlexAlign.SpaceAround }) {
+        Button('cancel')
+          .onClick(() => {
+            this.controller.close()
+            if (this.cancel) {
+              this.cancel()
+            }
+          }).backgroundColor(0xffffff).fontColor(Color.Black)
+
+        Button('confirm')
+          .onClick(() => {
+            this.controller.close()
+            if (this.confirm) {
+              this.confirm()
+            }
+          }).backgroundColor(0xffffff).fontColor(Color.Red)
+      }.margin({ bottom: 10 })
+    }
+  }
+}
+```
+
+### 第二步：创建构造器，与装饰器呼应相连 和点击onClick事件绑定的组件使弹窗弹出。
+
+```typescript
+@Entry
+@Component
+struct Index {
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: customDialogExample({
+      cancel: ()=> { this.onCancel() },
+      confirm: ()=> { this.onAccept() },
+    }),
+  })
+  onCancel() {
+    console.info('Callback when the first button is clicked')
+  }
+
+  onAccept() {
+    console.info('Callback when the second button is clicked')
+  }
+
+  build() {
+    Row() {
+      Column() {
+        Column() {
+          Button('click me')
+            .onClick(() => {
+              this.dialogController.open()
+            })
+        }
+        .width('100%')
+      }
+      .height('100%')
+    }
+  }
+}
+```
+> 弹窗可用于数据交互，完成用户一系列响应操作。
+> 在@CustomDialog装饰器内添加按钮，同时添加数据函数。
+> 页面内需要在构造器内进行接收，同时创建相应的函数操作。
 
 ## Topbar template
 ### Effect:
@@ -400,3 +485,4 @@ export struct BundleInfo {
       .padding({ left: 5 })
     }
 ```
+
