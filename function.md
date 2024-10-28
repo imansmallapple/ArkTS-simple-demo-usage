@@ -2,7 +2,7 @@
 
 1. [横竖屏控制变量island](#横竖屏控制变量island)
 2. [不同页面路由传参以对象为例子](#不同页面路由传参以对象为例子)
-
+3. [自定义列表弹窗传参案例](#自定义列表弹窗传参案例)
 
 ## 横竖屏控制变量island
 ### Effect:
@@ -127,3 +127,95 @@ struct Page2 {
 > 注意1: 接收的params要声明类型，上面例子中为 `const params = router.getParams() as People`
 
 > 注意2：可以在第二个页面即将出现的时候渲染，调用aboutToAppear()方法
+
+## 自定义列表弹窗传参案例
+
+### Effect
+<div>
+        <img src="screenshots/customDialog_2.png">
+</div>
+
+```typescript
+import { MyDataSource } from '../common/myData'
+
+@Preview
+@CustomDialog
+struct CustomDialogList {
+  controller: CustomDialogController
+  private menu: Array<string> = ['Watermelon', 'Strawberry', 'Apple']
+  action!: (value: string) => void
+
+  build() {
+    Column() {
+      LazyForEach(new MyDataSource(this.menu), (item: string) => {
+
+        Text(item)
+          .height(50)
+          .padding(10)
+          .fontSize(24)
+          .textAlign(TextAlign.Center)
+          .textOverflow({ overflow: TextOverflow.None })
+
+          .onClick(() => {
+            this.controller.close()
+            this.action(item)
+          })
+      }, (item: string) => JSON.stringify(item))
+    }
+  }
+}
+
+@Entry
+@Component
+struct Index {
+  private index: number = 0;
+  private menu: Array<string> = ['Watermelon', 'Strawberry', 'Apple', 'Orange']
+  @State @Watch('amountChange') select: string = '';
+  @State @Watch('amountChange') amount: number = 0;
+  private selectStuff!: (index: number, good: string, count: number) => void;
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: CustomDialogList({
+      menu: this.menu,
+      action: this.action.bind(this)
+    }),
+    autoCancel: false
+  })
+
+  amountChange() {
+    if (this.select != undefined) {
+      this.selectStuff(this.index, this.select, this.amount);
+    }
+  }
+
+  action(value: string) {
+    this.select = value;
+  }
+
+  build() {
+    Row() {
+      Column() {
+
+        Text('Select Fruit')
+          .onClick(() => {
+            this.dialogController.open()
+          })
+          .border({
+            width: 1
+          })
+          .padding(15)
+
+        Text(this.select)
+          .height(50)
+          .width(150)
+          .padding(12)
+          .fontSize(20)
+          .textAlign(TextAlign.Center)
+          .border({ width: 2, color: Color.Black })
+          .textOverflow({ overflow: TextOverflow.None })
+      }
+      .width('100%')
+    }
+    .height('100%')
+  }
+}
+```
