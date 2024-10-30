@@ -3,6 +3,7 @@
 1. [横竖屏控制变量island](#横竖屏控制变量island)
 2. [不同页面路由传参以对象为例子](#不同页面路由传参以对象为例子)
 3. [自定义列表弹窗传参案例](#自定义列表弹窗传参案例)
+4. [应用全局的UI状态存储案例](#应用全局的UI状态存储案例)
 
 ## 横竖屏控制变量island
 ### Effect:
@@ -219,3 +220,55 @@ struct Index {
   }
 }
 ```
+
+## 应用全局的UI状态存储案例
+#### 以我的数学通为例
+需求： 需要在练习完成的弹窗中点击打卡，将打卡记录同步到社区页面
+
+#### 第一步： 定义全局UI状态变量
+我需要将打卡记录列表`PostInfo[]`定义成名为records的全局UI状态变量，同时其id也需要记录
+```typescript
+AppStorage.setOrCreate<PostInfo[]>("records", []);
+AppStorage.setOrCreate<number>("record_id", 0);
+```
+
+#### 第二步： 定义全局UI状态变量
+在自定义弹窗中操作全局变量，通过@StorageProp或者@StorageLink装饰器  
+
+更新全局UI状态变量的操作如下
+
+```typescript
+  AppStorage.setOrCreate("records", this.records);
+  AppStorage.setOrCreate("record_id", this.record_id);
+```
+项目中的例子：
+```
+@CustomDialog
+struct ResultDialog {
+  @StorageLink("records") records: PostInfo[] = [];
+  @StorageLink("record_id") record_id: number = 0;
+  build(){
+Button()
+.onClick(()=>{
+// 某些操作
+      let record = generatePunchRecord(
+        this.record_id++,
+        this.correctCount,
+        this.answeredCount,
+        this.timeUsed,
+      )
+      this.records.push(record)
+      AppStorage.setOrCreate("records", this.records);
+      AppStorage.setOrCreate("record_id", this.record_id);
+    })
+  }
+}
+```
+
+#### 第三步：在别的页面调用全局UI状态变量
+直接调用AppStorage.get()方法即可
+```typescript
+ @State postInfoList: PostInfo[] = AppStorage.get("records") ?? []
+```
+> **Note**: AppStorage.get()方法可能会出现undefined结果导致赋值失败，最好加上一个默认值`?? []`
+
