@@ -1,4 +1,4 @@
-# AppStore API 11 (回家准备 Scroll() Navigation() Tabs())
+# AppStore API 11
 
 本文档展示了在构造基于 API9 Oniro 应用商城时遇到的问题
 
