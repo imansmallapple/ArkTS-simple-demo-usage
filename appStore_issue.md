@@ -146,26 +146,58 @@ interface Fonts {
 
 https://forums.openharmony.cn/forum.php?mod=viewthread&tid=1601
 
+https://segmentfault.com/q/1010000045214058
+
 由于无法为 globalThis 添加静态类型，只能通过查找的方式访问 globalThis 的属性，造成额外的性能开销。另外，无法为 globalThis 的属性标记类型，无法保证对这些属性操作的安全和高性能。因此 ArkTS 不支持 globalThis。
 
 建议按照业务逻辑根据 import/export 语法实现数据在不同模块的传递。
 
-必要情况下，可以通过构造的单例对象来实现全局对象的功能。(**说明：**不能在 har 中定义单例对象，har 在打包时会在不同的 hap 中打包两份，无法实现单例。)
+必要情况下，可以通过构造的单例对象来实现全局对象的功能。(**说明：** 不能在 har 中定义单例对象，har 在打包时会在不同的 hap 中打包两份，无法实现单例。)
 
 #### 解决方法
 
-组件内声明 windowStage 然后通过 this 指针调用
+##### 步骤一
+
+在 entryability 中将 windowStage 存储到全局 UI 变量中
+
+> 目前 windowStage 只在 onWindowStageCreate 中存在。获取需要使用 AppStorage。
 
 ```typescript
-windowStage?: window.WindowStage;
+  onWindowStageCreate(windowStage: window.WindowStage): void {
+    // Main window is created, set main page for this ability
+    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+    windowStage.loadContent('pages/Index', (err) => {
+      if (err.code) {
+        hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
+        return;
+      }
+
+       AppStorage.setOrCreate("windowStage", windowStage);
+
+      hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
+    });
+  }
 ```
+
+##### 步骤二
+
+在 `changeLFS` 函数中获取 windowStage 通过 `AppStorage.get` 方法
 
 ```typescript
   changeLFS() {
+    // 从 AppStorage 获取 windowStage 实例
+    const windowStage = AppStorage.get<window.WindowStage>("windowStage");
+
+    if (!windowStage) {
+      console.error("windowStage is not available in AppStorage.");
+      return;
+    }
+
     if (this.currentIndex == 3) {
-      WindowStageUtil.setLayoutFullScreen(this.windowStage, '#f3f4f6', WindowStageUtil.COLOR_BLACK, '#f7f7f7', WindowStageUtil.COLOR_BLACK);
+      WindowStageUtil.setLayoutFullScreen(windowStage, '#f3f4f6', WindowStageUtil.COLOR_BLACK, '#f7f7f7', WindowStageUtil.COLOR_BLACK);
     } else {
-      WindowStageUtil.setLayoutFullScreen(this.windowStage, WindowStageUtil.COLOR_WHITE, WindowStageUtil.COLOR_BLACK, '#f7f7f7', WindowStageUtil.COLOR_BLACK);
+      WindowStageUtil.setLayoutFullScreen(windowStage, WindowStageUtil.COLOR_WHITE, WindowStageUtil.COLOR_BLACK, '#f7f7f7', WindowStageUtil.COLOR_BLACK);
     }
   }
 ```
