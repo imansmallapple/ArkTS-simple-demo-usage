@@ -15,6 +15,9 @@
     - [第二个新的问题(Indexed access is not supported for fields)](#第二个新的问题indexed-access-is-not-supported-for-fields)
 8. [Object.assign报错](#objectassign报错)
 9. [对象属性名称非标识符报错](#对象属性名称非标识符报错)
+10. [.catch(err)报错](#catcherr报错)
+11. [router接收参数报错](#router接收参数报错)
+
 ## fonts 报错
 
 ```
@@ -411,6 +414,9 @@ export const registerAllFonts = () => {
 经过初步代码修改，发现仍然报错， 信息如下
 <img src='appStore_image/problem_6.2.png' width="500">
 
+相同的问题在 `AppInfo.ets` 中也出现了
+
+<img src='appStore_image/problem_9.png' width="500">
 ##### 解决方法
 可以使用 `Object(item)[key]` 或者 `JSON.parse(JSON.stringify(item))[key]`
 
@@ -544,3 +550,58 @@ https://blog.csdn.net/yuanlaile/article/details/139123015
 
 https://segmentfault.com/a/1190000044588922
 
+## .catch(err)报错
+#### 报错信息
+arkts-no-any-unknown
+
+<img src='appStore_image/problem_10.png' width="500">
+
+#### 解决方法
+存在没有声明具体类型的变量，常见于`try-catch`中的`err`，可以将它声明为`BussinessError`
+```typescript
+import { BusinessError } from '@ohos.base';
+
+...
+
+, (err: BusinessError) => {
+  console.error(`startApplication promise error: ${JSON.stringify(err)}`);
+  promptAction.showToast({ message: $r('app.string.open_failed_app_not_found'), duration: ToastDuration });
+};
+```
+
+#### 参考文档
+https://blog.csdn.net/lz8362/article/details/135171005
+
+## router接收参数报错
+#### 报错信息
+
+<img src='appStore_image/problem_11.png' width="600">
+通过路由传入页面的参数列表如下：
+
+```typescript
+  router.pushUrl({
+    url: 'pages/AppDetail',
+    params: { appInfo: this.appInfo, localVersionName: this.versionCode }
+  });
+```
+#### 解决方法
+##### 步骤一
+自定义接口类型
+
+```typescript
+interface RouterParams {
+  appInfo?: AppInfo;
+  localVersionName?: string;
+}
+```
+##### 步骤二
+通过 `as Type` 的方式获取参数
+
+```typescript
+const params = router.getParams() as RouterParams
+this.appInfo = new AppInfo(params.appInfo)
+this.localVersionName = params.localVersionName
+```
+
+#### 参考文档
+https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/ui/arkts-routing.md
