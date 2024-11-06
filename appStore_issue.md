@@ -8,7 +8,7 @@
 2. [语法适配 globalThis 无法使用 windowStage](#语法适配-globalthis-无法使用-windowstage)
 3. [resource 转 string 类型](#resource转string类型)
 4. [ArkTS-no-definite-assignment](#ArkTS-no-definite-assignment)
-5. [main_pages.json 页面必须有唯一入口](#main_pagesjson页面必须有唯一入口)
+5. [main_pages.json 页面必须有唯一入口](#main_pagesjson-页面必须有唯一入口)
 6. [语法适配 globalThis 无法使用 abilityContext.filesDir](#语法适配-globalthis-无法使用-abilitycontextfilesdir)
 7. [语法适配 for...in 无法使用](#语法适配-forin-无法使用)
    - [第一个新的问题(ArkTS 遍历对象数组)](#第一个新的问题arkts遍历对象数组)
@@ -295,7 +295,7 @@ https://segmentfault.com/q/1010000045206935
 
 #### 报错信息
 
-每个声明在 `model_json.ets` 中的页面必须且唯一有一个入口装饰器
+每个声明在 `model_json.ets` 中的页面必须且唯一有一个入口装饰器  
 <img src='appStore_image/problem_4.png' width="500">
 
 #### 解决办法
@@ -456,12 +456,13 @@ export const registerAllFonts = () => {
 
 #### 第二个新的问题(Indexed access is not supported for fields)
 
-经过初步代码修改，发现仍然报错， 信息如下
+经过初步代码修改，发现仍然报错， 信息如下  
 <img src='appStore_image/problem_6.2.png' width="500">
 
 相同的问题在 `AppInfo.ets` 中也出现了
 
 <img src='appStore_image/problem_9.png' width="500">
+
 ##### 解决方法
 
 可以使用 `Object(item)[key]` 或者 `JSON.parse(JSON.stringify(item))[key]`
