@@ -18,6 +18,10 @@
 10. [.catch(err)报错](#catcherr报错)
 11. [router接收参数报错](#router接收参数报错)
 
+实机测试发现的问题
+
+1. [Web组件无法通过参数渲染](#web组件无法通过参数渲染)
+2. [服务器数据无法渲染](#服务器数据无法渲染)
 ## fonts 报错
 
 ```
@@ -605,3 +609,29 @@ this.localVersionName = params.localVersionName
 
 #### 参考文档
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/ui/arkts-routing.md
+
+## Web组件无法通过参数渲染
+#### 情景描述
+创建的 `Web` 组件在初始化参数中无法进行动态渲染
+```typescript
+  Web({ src: this.url, controller: this.controller }) //这里的src如果我们传入具体的url字符串则可以渲染网页
+```
+#### 解决方法
+通过控制器的 `loadUrl` 接口将此Web组件显示页面变更
+```typescript
+import webview from '@ohos.web.webview';
+//初始化Web控制器
+controller: webview.WebviewController = new webview.WebviewController()
+```
+
+```typescript
+// 在Web组件的onControllerAttached回调函数中调用
+Web({ src: this.url, controller: this.controller })
+  .onControllerAttached(() => {
+    this.controller.loadUrl(this.url)
+  })
+```
+#### 参考文档
+https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/web/web-page-loading-with-web-components.md
+
+## 服务器数据无法渲染
