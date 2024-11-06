@@ -11,7 +11,7 @@
 5. [main_pages.json 页面必须有唯一入口](#main_pagesjson-页面必须有唯一入口)
 6. [语法适配 globalThis 无法使用 abilityContext.filesDir](#语法适配-globalthis-无法使用-abilitycontextfilesdir)
 7. [语法适配 for...in 无法使用](#语法适配-forin-无法使用)
-   - [第一个新的问题(ArkTS 遍历对象数组)](#第一个新的问题arkts遍历对象数组)
+   - [第一个新的问题(ArkTS 遍历对象数组)](#第一个新的问题arkts-遍历对象数组)
    - [第二个新的问题(Indexed access is not supported for fields)](#第二个新的问题indexed-access-is-not-supported-for-fields)
 8. [Object.assign 报错](#objectassign报错)
 9. [对象属性名称非标识符报错](#对象属性名称非标识符报错)
@@ -408,7 +408,7 @@ for (let i = 0; i < a.length; ++i) {
 
 #### 第一个新的问题(ArkTS 遍历对象数组)
 
-由于项目中定义的 `fonts` 不是数组而是对象，所以不可以 for 循环遍历
+由于项目中定义的 `fonts` 不是数组而是对象，所以不可以 for 循环遍历  
 <img src='appStore_image/problem_6.1.png' width="500">
 
 #### 解决方案
