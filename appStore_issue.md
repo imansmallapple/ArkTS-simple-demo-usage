@@ -6,28 +6,31 @@
 
 1. [fonts 报错](#fonts报错)
 2. [语法适配 globalThis 无法使用 windowStage](#语法适配-globalthis-无法使用-windowstage)
-3. [resource转string类型](#resource转string类型)
+3. [resource 转 string 类型](#resource转string类型)
 4. [ArkTS-no-definite-assignment](#ArkTS-no-definite-assignment)
-5. [main_pages.json页面必须有唯一入口](#main_pagesjson页面必须有唯一入口)
+5. [main_pages.json 页面必须有唯一入口](#main_pagesjson-页面必须有唯一入口)
 6. [语法适配 globalThis 无法使用 abilityContext.filesDir](#语法适配-globalthis-无法使用-abilitycontextfilesdir)
 7. [语法适配 for...in 无法使用](#语法适配-forin-无法使用)
-    - [第一个新的问题(ArkTS遍历对象数组)](#第一个新的问题arkts遍历对象数组)
-    - [第二个新的问题(Indexed access is not supported for fields)](#第二个新的问题indexed-access-is-not-supported-for-fields)
-8. [Object.assign报错](#objectassign报错)
+   - [第一个新的问题(ArkTS 遍历对象数组)](#第一个新的问题arkts-遍历对象数组)
+   - [第二个新的问题(Indexed access is not supported for fields)](#第二个新的问题indexed-access-is-not-supported-for-fields)
+8. [Object.assign 报错](#objectassign报错)
 9. [对象属性名称非标识符报错](#对象属性名称非标识符报错)
 10. [.catch(err)报错](#catcherr报错)
-11. [router接收参数报错](#router接收参数报错)
+11. [router 接收参数报错](#router接收参数报错)
 
 实机测试发现的问题
 
-1. [Web组件无法通过参数渲染](#web组件无法通过参数渲染)
+1. [Web 组件无法通过参数渲染](#web组件无法通过参数渲染)
 2. [服务器数据无法渲染](#服务器数据无法渲染)
 
+<<<<<<< HEAD
 项目开发新增需求
 1. [网页加载过程中需要缓冲组件和连接失败页面](#网页加载过程中需要缓冲组件和连接失败页面)
 2. [下拉实现刷新](#下拉实现刷新)
 
 项目优化
+=======
+>>>>>>> fdf7bc662a48e34ae7b5ec0debc5109c6842f1a7
 ## fonts 报错
 
 ```
@@ -224,73 +227,93 @@ https://segmentfault.com/q/1010000045214058
     }
   }
 ```
+
 #### 后续查验
+
 在日志中发现在 `AppStorage` 中无法获取 `windowStage`, 怀疑是否是因为缺少模拟器或者真机
 ![Alt text](appStore_image/problem_1.1.png)
 
-
-## resource转string类型
+## resource 转 string 类型
 
 #### 报错信息
+
 某些组件的入参并不支持 `Resource` 类型
 ![Alt text](appStore_image/problem_2.png)
 
 #### 解决办法
+
 ##### 第一步
-在组件中封装ResourceToString方法
+
+在组件中封装 ResourceToString 方法
+
 ```typescript
   ResourceToString(resource:Resource):string{
    return getContext(this).resourceManager.getStringSync(resource)
   }
 ```
-##### 第二步
-直接在需要的地方调用
-```typescript
-Search()
-  .searchButton(this.ResourceToString($r('app.string.search')))
 
+##### 第二步
+
+直接在需要的地方调用
+
+```typescript
+Search().searchButton(this.ResourceToString($r("app.string.search")));
 ```
 
 ### 参考文档
-**ArkTs的资源Resource类型怎么转为string:**
+
+**ArkTs 的资源 Resource 类型怎么转为 string:**
 https://blog.csdn.net/gsrkuang/article/details/136773584?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-136773584-blog-134664276.235%5Ev43%5Epc_blog_bottom_relevance_base2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-136773584-blog-134664276.235%5Ev43%5Epc_blog_bottom_relevance_base2&utm_relevant_index=5
 
 #### 后续查验
-部分功能是mock实现，需要真机查验
+
+部分功能是 mock 实现，需要真机查验
 ![Alt text](appStore_image/problem_2.1.png)
+
 ## ArkTS-no-definite-assignment
+
 #### 报错信息
-ArkTS编译的时候有一些警告，例如下面这种变量定义的!语法，会有警告
+
+ArkTS 编译的时候有一些警告，例如下面这种变量定义的!语法，会有警告
 ![Alt text](appStore_image/problem_3.png)
 
 #### 解决办法
-官方的解决办法是在定义的时候或者构造函数的时候进行初始化，但是有些对象类型是Interface或者type，这种类型进行初始化推荐用null的方式去初始化对象类型，但使用的地方需要判空
 
-对象类型用null进行初始化例子：
+官方的解决办法是在定义的时候或者构造函数的时候进行初始化，但是有些对象类型是 Interface 或者 type，这种类型进行初始化推荐用 null 的方式去初始化对象类型，但使用的地方需要判空
+
+对象类型用 null 进行初始化例子：
+
 ```typescript
 private applicationContext: common.ApplicationContext|null=null;
 private uiAbilityContext: common.UIAbilityContext|null=null;
 private uiContext: UIContext|null=null;
 private windowStage: window.WindowStage|null=null;
 ```
+
 对于判空的地方太多这个问题，目前没有优化方案，增加判空是为了安全性考虑，如果缺少判空，后续可能会遇到崩溃
 
 告警目前规格是无法配置消除
 
 ### 参考文档
-**ArkTS警告处理最佳实践**:
+
+**ArkTS 警告处理最佳实践**:
 https://segmentfault.com/q/1010000045206935
 
-## main_pages.json页面必须有唯一入口
+## main_pages.json 页面必须有唯一入口
+
 #### 报错信息
-每个声明在 `model_json.ets` 中的页面必须且唯一有一个入口装饰器
+
+每个声明在 `model_json.ets` 中的页面必须且唯一有一个入口装饰器  
 <img src='appStore_image/problem_4.png' width="500">
 
 #### 解决办法
+
 ##### 步骤一
+
 移除在 `main_json.ets` 文件中不需要的入口的页面
 
 下面的例子中移除掉 `"pages/SettingPage"`
+
 ```typescript
 {
   "src": [
@@ -300,20 +323,29 @@ https://segmentfault.com/q/1010000045206935
   ]
 }
 ```
+
 ##### 步骤二
+
 确保 `SettingPage` 中不存在 `@Entry` 入口装饰器
+
 ### 参考文档
+
 https://segmentfault.com/q/1010000045049039
 
-
 ## 语法适配 globalThis 无法使用 abilityContext.filesDir
+
 #### 报错信息
-类似于上面Problem 4, globalThis无法使用
+
+类似于上面 Problem 4, globalThis 无法使用
 
 #### 解决方法
-使用AppStorage方法的位置不同
+
+使用 AppStorage 方法的位置不同
+
 ##### 步骤一
+
 在 `EntryAbility.ets` 文件中存储 `filesDir`
+
 ```typescript
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -324,8 +356,11 @@ export default class EntryAbility extends UIAbility {
   ···
 }
 ```
+
 ##### 步骤二
-在需要的方法中声明filesDir变量并将AppStorage中的数据存放进去， 然后在需要的地方使用即可
+
+在需要的方法中声明 filesDir 变量并将 AppStorage 中的数据存放进去， 然后在需要的地方使用即可
+
 ```typescript
   clearCache() {
     // 从 AppStorage 获取 filesDir 数据
@@ -351,7 +386,6 @@ export default class EntryAbility extends UIAbility {
   }
 ```
 
-
 ## 语法适配 for...in 无法使用
 
 #### 报错信息
@@ -359,39 +393,48 @@ export default class EntryAbility extends UIAbility {
 <img src='appStore_image/problem_6.png' width="500">
 
 #### 解决 for...in 不兼容方法
-由于在ArkTS中，对象布局在编译时是确定的、并且不能在运行时被改变，所以不支持使用for … in迭代一个对象的属性。对于数组来说，可以使用常规的for循环
+
+由于在 ArkTS 中，对象布局在编译时是确定的、并且不能在运行时被改变，所以不支持使用 for … in 迭代一个对象的属性。对于数组来说，可以使用常规的 for 循环
+
 - Typescript
+
 ```typescript
-let a: string[] = ['1.0', '2.0', '3.0'];
+let a: string[] = ["1.0", "2.0", "3.0"];
 for (let i in a) {
   console.log(a[i]);
 }
 ```
+
 - ArkTS
+
 ```typescript
-let a: string[] = ['1.0', '2.0', '3.0'];
+let a: string[] = ["1.0", "2.0", "3.0"];
 for (let i = 0; i < a.length; ++i) {
   console.log(a[i]);
 }
 ```
 
-#### 第一个新的问题(ArkTS遍历对象数组)
-由于项目中定义的 `fonts` 不是数组而是对象，所以不可以for循环遍历
+#### 第一个新的问题(ArkTS 遍历对象数组)
+
+由于项目中定义的 `fonts` 不是数组而是对象，所以不可以 for 循环遍历  
 <img src='appStore_image/problem_6.1.png' width="500">
 
 #### 解决方案
-要遍历object和Record这种类型的对象可以使用 `Object.keys()` 方法获取对象的所有属性，并进行遍历
+
+要遍历 object 和 Record 这种类型的对象可以使用 `Object.keys()` 方法获取对象的所有属性，并进行遍历
 
 ##### 举例
+
 ```typescript
 const obj = { a: 1, b: 2, c: 3 };
 
-Object.keys(obj).forEach(key => {
+Object.keys(obj).forEach((key) => {
   console.log(key, obj[key]);
 });
 ```
 
 ##### 修改前
+
 ```typescript
 export const registerAllFonts = () => {
   for (const key in fonts) {
@@ -408,64 +451,68 @@ export const registerAllFonts = () => {
 
 ```typescript
 export const registerAllFonts = () => {
-
-  Object.keys(fonts).forEach((key)=>{
+  Object.keys(fonts).forEach((key) => {
     const fontDetails: Font = fonts[key];
     // 注册字体
     font.registerFont({
       familyName: fontDetails.familyName,
       familySrc: fontDetails.familySrc,
     });
-  })
+  });
 };
 ```
 
 #### 第二个新的问题(Indexed access is not supported for fields)
-经过初步代码修改，发现仍然报错， 信息如下
+
+经过初步代码修改，发现仍然报错， 信息如下  
 <img src='appStore_image/problem_6.2.png' width="500">
 
 相同的问题在 `AppInfo.ets` 中也出现了
 
 <img src='appStore_image/problem_9.png' width="500">
+
 ##### 解决方法
+
 可以使用 `Object(item)[key]` 或者 `JSON.parse(JSON.stringify(item))[key]`
 
 ##### 最终的代码
+
 采取了 ` Object(item)[key]` 的方式
+
 ```typescript
 export const registerAllFonts = () => {
-
-  Object.keys(fonts).forEach((key)=>{
+  Object.keys(fonts).forEach((key) => {
     const fontDetails: Font = Object(fonts)[key];
     // 注册字体
     font.registerFont({
       familyName: fontDetails.familyName,
       familySrc: fontDetails.familySrc,
     });
-  })
+  });
 };
 ```
 
-
-
 #### 参考文档
-ArkTS不支持for … in的适配规则： 
+
+ArkTS 不支持 for … in 的适配规则：
 https://ost.51cto.com/posts/29738
 
-ArkTS中如何遍历对象：
+ArkTS 中如何遍历对象：
 https://segmentfault.com/q/1010000044602257
 
 访问对象值的报错问题：
 https://blog.csdn.net/qq_54418719/article/details/140772066?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ECtr-2-140772066-blog-135171005.235%5Ev43%5Epc_blog_bottom_relevance_base2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ECtr-2-140772066-blog-135171005.235%5Ev43%5Epc_blog_bottom_relevance_base2&utm_relevant_index=5
 
-## Object.assign报错
+## Object.assign 报错
 
 #### 报错信息
 
 <img src='appStore_image/problem_7.png' width="600">
 
 #### 解决方法
-在 ts 文件中封装一个工具类，然后在ets中引入使用。(把原文件换成ts文件，再ets中引入)
+
+在 ts 文件中封装一个工具类，然后在 ets 中引入使用。(把原文件换成 ts 文件，再 ets 中引入)
+
 ```typescript
 export class ObjectUtils {
   /**
@@ -474,23 +521,27 @@ export class ObjectUtils {
    *@param source 源对象
    *@return 合并后的对象
    **/
-  static assign(target: Object, source?: Object): Object{
+  static assign(target: Object, source?: Object): Object {
     return Object.assign(target, source);
   }
 }
 ```
+
 #### 新的问题
-引入ObjectUtils后出现新的报错
-不能把Partial<Object>类型的变量作为对象类型
+
+引入 ObjectUtils 后出现新的报错
+不能把 Partial<Object>类型的变量作为对象类型
 <img src='appStore_image/problem_7.1.png' width="600">
 
 ##### 解决方法
+
 使用 `as` 进行强制类型转换
+
 ```typescript
-import { ObjectUtils } from '../utils/ObjectUtils';
+import { ObjectUtils } from "../utils/ObjectUtils";
 
 class HomePageData {
-  static defaultAnnouncement = '';
+  static defaultAnnouncement = "";
   constructor(source: Partial<Object>) {
     ObjectUtils.assign(this, source as Object);
   }
@@ -499,11 +550,11 @@ class HomePageData {
   // 公告内容
   announcement: string = "";
 }
-export {HomePageData}
+export { HomePageData };
 ```
 
-
 #### 参考文档
+
 HarmonyOS Object.assign\(target, source\)报错问题：
 https://segmentfault.com/q/1010000045208468
 
@@ -511,7 +562,9 @@ Argument of type partial is not assignable to parameter of type:
 https://stackoverflow.com/questions/63507831/argument-of-type-partial-is-not-assignable-to-parameter-of-type
 
 ## 对象属性名称非标识符报错
+
 #### 报错信息
+
 有两个报错：
 
 - arkts-no-untyped-obj-literals：对象文字必须对应某个显式声明的类或接口
@@ -520,10 +573,13 @@ https://stackoverflow.com/questions/63507831/argument-of-type-partial-is-not-ass
 <img src='appStore_image/problem_8.png' width="600">
 
 #### 解决方法
-ArkTSCheck 中的   `arkts-identifiers-as-prop-names` 规则不允许对象属性名称使用非标识符（如中文字符、空格等）。由于 `AppActionText` 枚举值包含中文字符，直接将它们用作对象的键会触发该规则。
+
+ArkTSCheck 中的 `arkts-identifiers-as-prop-names` 规则不允许对象属性名称使用非标识符（如中文字符、空格等）。由于 `AppActionText` 枚举值包含中文字符，直接将它们用作对象的键会触发该规则。
 
 我使用的解决方案是创建一个映射类型，将枚举值转换为标识符友好的英文键
+
 ##### 步骤一
+
 定义 `ActionTextMap` 接口，替代对象字面量类型
 
 ```typescript
@@ -535,7 +591,9 @@ interface ActionTextMap {
 ```
 
 ##### 步骤二
+
 使用 `ActionTextMap` 接口声明 `actionTextMap` 对象
+
 ```typescript
 const actionTextMap: ActionTextMap = {
   open: AppActionText.OPEN,
@@ -545,12 +603,18 @@ const actionTextMap: ActionTextMap = {
 ```
 
 ##### 步骤三
+
 定义 `classes` 对象，使用标识符友好的键名
+
 ```typescript
 const classes: AppActionClasses = {
-  open: getContext(this).resourceManager.getStringSync($r('app.string.open')),
-  install: getContext(this).resourceManager.getStringSync($r('app.string.install')),
-  update: getContext(this).resourceManager.getStringSync($r('app.string.update'))
+  open: getContext(this).resourceManager.getStringSync($r("app.string.open")),
+  install: getContext(this).resourceManager.getStringSync(
+    $r("app.string.install")
+  ),
+  update: getContext(this).resourceManager.getStringSync(
+    $r("app.string.update")
+  ),
 };
 ```
 
@@ -561,13 +625,17 @@ https://blog.csdn.net/yuanlaile/article/details/139123015
 https://segmentfault.com/a/1190000044588922
 
 ## .catch(err)报错
+
 #### 报错信息
+
 arkts-no-any-unknown
 
 <img src='appStore_image/problem_10.png' width="500">
 
 #### 解决方法
+
 存在没有声明具体类型的变量，常见于`try-catch`中的`err`，可以将它声明为`BussinessError`
+
 ```typescript
 import { BusinessError } from '@ohos.base';
 
@@ -580,22 +648,27 @@ import { BusinessError } from '@ohos.base';
 ```
 
 #### 参考文档
+
 https://blog.csdn.net/lz8362/article/details/135171005
 
-## router接收参数报错
+## router 接收参数报错
+
 #### 报错信息
 
 <img src='appStore_image/problem_11.png' width="600">
 通过路由传入页面的参数列表如下：
 
 ```typescript
-  router.pushUrl({
-    url: 'pages/AppDetail',
-    params: { appInfo: this.appInfo, localVersionName: this.versionCode }
-  });
+router.pushUrl({
+  url: "pages/AppDetail",
+  params: { appInfo: this.appInfo, localVersionName: this.versionCode },
+});
 ```
+
 #### 解决方法
+
 ##### 步骤一
+
 自定义接口类型
 
 ```typescript
@@ -604,40 +677,50 @@ interface RouterParams {
   localVersionName?: string;
 }
 ```
+
 ##### 步骤二
+
 通过 `as Type` 的方式获取参数
 
 ```typescript
-const params = router.getParams() as RouterParams
-this.appInfo = new AppInfo(params.appInfo)
-this.localVersionName = params.localVersionName
+const params = router.getParams() as RouterParams;
+this.appInfo = new AppInfo(params.appInfo);
+this.localVersionName = params.localVersionName;
 ```
 
 #### 参考文档
+
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/ui/arkts-routing.md
 
-## Web组件无法通过参数渲染
+## Web 组件无法通过参数渲染
+
 #### 情景描述
+
 创建的 `Web` 组件在初始化参数中无法进行动态渲染
+
 ```typescript
-  Web({ src: this.url, controller: this.controller }) //这里的src如果我们传入具体的url字符串则可以渲染网页
+Web({ src: this.url, controller: this.controller }); //这里的src如果我们传入具体的url字符串则可以渲染网页
 ```
+
 #### 解决方法
-通过控制器的 `loadUrl` 接口将此Web组件显示页面变更
+
+通过控制器的 `loadUrl` 接口将此 Web 组件显示页面变更
+
 ```typescript
-import webview from '@ohos.web.webview';
+import webview from "@ohos.web.webview";
 //初始化Web控制器
-controller: webview.WebviewController = new webview.WebviewController()
+controller: webview.WebviewController = new webview.WebviewController();
 ```
 
 ```typescript
 // 在Web组件的onControllerAttached回调函数中调用
-Web({ src: this.url, controller: this.controller })
-  .onControllerAttached(() => {
-    this.controller.loadUrl(this.url)
-  })
+Web({ src: this.url, controller: this.controller }).onControllerAttached(() => {
+  this.controller.loadUrl(this.url);
+});
 ```
+
 #### 参考文档
+
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/web/web-page-loading-with-web-components.md
 
 ## 服务器数据无法渲染
