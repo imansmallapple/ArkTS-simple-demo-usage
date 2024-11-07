@@ -22,6 +22,12 @@
 
 1. [Web组件无法通过参数渲染](#web组件无法通过参数渲染)
 2. [服务器数据无法渲染](#服务器数据无法渲染)
+
+项目开发新增需求
+1. [网页加载过程中需要缓冲组件和连接失败页面](#网页加载过程中需要缓冲组件和连接失败页面)
+2. [下拉实现刷新](#下拉实现刷新)
+
+项目优化
 ## fonts 报错
 
 ```
@@ -635,3 +641,104 @@ Web({ src: this.url, controller: this.controller })
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/web/web-page-loading-with-web-components.md
 
 ## 服务器数据无法渲染
+
+
+## 网页加载过程中需要缓冲组件和连接失败页面
+
+### 缓冲组件
+
+- 定义状态变量 `isLoading`
+```typescript
+  @State isLoading: boolean = false
+```
+- 条件判断`isLoading`状态是否渲染缓冲动画 
+```typescript
+  if (this.isLoading) {
+    Column() {
+      LoadingProgress()
+        .color(Color.Blue)
+        .width(50)
+        .margin({ bottom: '10%' })
+    }
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+  }
+```
+- 在页面出现之前渲染缓冲动画
+```typescript
+  //执行其build()函数之前执行
+  aboutToAppear() {
+    this.isLoading = true
+  }
+```
+- 在Web组件开始渲染的时候隐藏缓冲动画
+```typescript
+Web({ src: this.url, controller: this.controller })
+  .onPageBegin((event) => {
+    this.isLoading = false
+  })
+```
+### 连接失败页面
+- 定义状态变量 `isHttpError`
+```typescript
+@State isHttpError: boolean = false
+```
+- 定义无网络组件
+
+```typescript
+if (this.isHttpError) {
+  Column() {
+    Column(){
+
+    Image($r('app.media.ic_no_wifi'))
+      .width('20%')
+      .opacity(0.4)
+    Text("Seems you don't have Internet")
+      .opacity(0.4)
+      .margin(5)
+    Button('Reload')
+      .fontColor(Color.Black)
+      .backgroundColor(Color.Orange)
+      .height('5%')
+      .width('35%')
+      .type(ButtonType.Normal)
+      .fontSize(14)
+      .borderRadius(5)
+      .fontWeight(FontWeight.Medium)
+      .opacity(0.6)
+      .onClick(() => {
+        // todo: Get code
+      })
+      .margin(10)
+    }
+    .margin({
+      bottom: '10%'
+    })
+  }
+  .height('100%')
+  .justifyContent(FlexAlign.Center)
+}
+```
+
+- 在Web组件`onErrorReceive`属性中控制状态变量
+```typescript
+.onErrorReceive((event)=>{
+  if(event){
+    this.isHttpError = true
+  }
+})
+```
+#### 参考文档
+LoadingProgress:  
+https://blog.csdn.net/qq_58213084/article/details/138597035
+onErrorReceive:  
+https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkweb/ts-basic-components-web.md
+
+
+## 下拉实现刷新
+
+#### 注意
+刷新功能如果有个按钮，必须在onclick回调函数中调用`this.controller.refresh()`和`this.controller.pushUrl()`
+
+#### 参考文档
+https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkweb/js-apis-webview.md#refresh
