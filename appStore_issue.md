@@ -823,5 +823,53 @@ https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkw
 #### 注意
 刷新功能如果有个按钮，必须在onclick回调函数中调用`this.controller.refresh()`和`this.controller.pushUrl()`
 
+#### 出现问题
+Refresh组件可以实现下拉刷新但是如果里面的唯一组件是Web则失败
+
+#### 问题解答
+`Web` 组件无法下拉刷新的问题通常与组件的原生行为和框架支持有关。
+因为 `Web` 组件本身是一个独立的视图，不支持与 `Refresh` 组件的交互式刷新行为，而嵌入式浏览器视图在默认情况下不会响应诸如手势或父级容器的下拉刷新。
+
+#### 替代方案
+采用 `Button` 组件手动点击触发刷新事件
+```typescript
+Stack() {
+  // 页面标题
+  Navigation()
+    .title(this.NavigationTitle())
+    .hideToolBar(true)
+    .height(56)
+    .width('100%')
+    .titleMode(NavigationTitleMode.Mini)
+    .hideBackButton(false)
+
+  Button() {
+    Image($r('app.media.ic_refresh'))
+      .height(30)
+      .width(30)
+  }
+  .zIndex(1)
+  .fontColor(Color.Black)
+  .backgroundColor(Color.White)
+  .height('5%')
+  .type(ButtonType.Circle)
+  .fontWeight(FontWeight.Medium)
+  .opacity(0.8)
+  .margin({
+    right: 15
+  })
+  .onClick(() => {
+    try {
+      this.isLoading = true
+      this.controller.refresh();
+      this.controller.loadUrl(this.url)
+    } catch (error) {
+      hilog.error(0x0, `ErrorCode: ${(error as BusinessError).code}`, `Message: ${(error as BusinessError).message}`);
+    }
+  })
+}
+.alignContent(Alignment.End)
+```
+
 #### 参考文档
 https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkweb/js-apis-webview.md#refresh
