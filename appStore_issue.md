@@ -724,7 +724,12 @@ Web({ src: this.url, controller: this.controller }).onControllerAttached(() => {
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/web/web-page-loading-with-web-components.md
 
 ## 服务器数据无法渲染
-
+#### 出现问题
+本地运行的服务器可以在预览器渲染但是实机不行，原因是因为实机没有通过网络连接到远程服务器，需要用过`ssh`连接到本地服务器然后输入`docker`命令
+```typescript
+docker run -d -p 5000:5000 gowokegobroke/oniro-data:latest
+```
+这样所有设备都可以连接到服务器，确保实机里连接了网络
 
 ## 网页加载过程中需要缓冲组件和连接失败页面
 
