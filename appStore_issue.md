@@ -22,15 +22,17 @@
 
 1. [Web 组件无法通过参数渲染](#web组件无法通过参数渲染)
 2. [服务器数据无法渲染](#服务器数据无法渲染)
+3. [APP 无法实现安装下载](#app-无法实现安装下载)
+4. [需要获取服务器 http 码来进行 UI 判断](#需要获取服务器-http-码来进行-ui-判断)
 
-<<<<<<< HEAD
 项目开发新增需求
+
 1. [网页加载过程中需要缓冲组件和连接失败页面](#网页加载过程中需要缓冲组件和连接失败页面)
 2. [下拉实现刷新](#下拉实现刷新)
+3. [本地服务器映射到公网调试](#本地服务器映射到公网调试)
 
-项目优化
-=======
->>>>>>> fdf7bc662a48e34ae7b5ec0debc5109c6842f1a7
+# 项目优化
+
 ## fonts 报错
 
 ```
@@ -724,11 +726,15 @@ Web({ src: this.url, controller: this.controller }).onControllerAttached(() => {
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/web/web-page-loading-with-web-components.md
 
 ## 服务器数据无法渲染
+
 #### 出现问题
+
 本地运行的服务器可以在预览器渲染但是实机不行，原因是因为实机没有通过网络连接到远程服务器，需要用过`ssh`连接到本地服务器然后输入`docker`命令
+
 ```typescript
 docker run -d -p 5000:5000 gowokegobroke/oniro-data:latest
 ```
+
 这样所有设备都可以连接到服务器，确保实机里连接了网络
 
 ## 网页加载过程中需要缓冲组件和连接失败页面
@@ -736,10 +742,13 @@ docker run -d -p 5000:5000 gowokegobroke/oniro-data:latest
 ### 缓冲组件
 
 - 定义状态变量 `isLoading`
+
 ```typescript
   @State isLoading: boolean = false
 ```
-- 条件判断`isLoading`状态是否渲染缓冲动画 
+
+- 条件判断`isLoading`状态是否渲染缓冲动画
+
 ```typescript
   if (this.isLoading) {
     Column() {
@@ -752,25 +761,32 @@ docker run -d -p 5000:5000 gowokegobroke/oniro-data:latest
     .justifyContent(FlexAlign.Center)
   }
 ```
+
 - 在页面出现之前渲染缓冲动画
+
 ```typescript
   //执行其build()函数之前执行
   aboutToAppear() {
     this.isLoading = true
   }
 ```
-- 在Web组件开始渲染的时候隐藏缓冲动画
+
+- 在 Web 组件开始渲染的时候隐藏缓冲动画
+
 ```typescript
-Web({ src: this.url, controller: this.controller })
-  .onPageBegin((event) => {
-    this.isLoading = false
-  })
+Web({ src: this.url, controller: this.controller }).onPageBegin((event) => {
+  this.isLoading = false;
+});
 ```
+
 ### 连接失败页面
+
 - 定义状态变量 `isHttpError`
+
 ```typescript
 @State isHttpError: boolean = false
 ```
+
 - 定义无网络组件
 
 ```typescript
@@ -808,7 +824,8 @@ if (this.isHttpError) {
 }
 ```
 
-- 在Web组件`onErrorReceive`属性中控制状态变量
+- 在 Web 组件`onErrorReceive`属性中控制状态变量
+
 ```typescript
 .onErrorReceive((event)=>{
   if(event){
@@ -816,27 +833,33 @@ if (this.isHttpError) {
   }
 })
 ```
+
 #### 参考文档
+
 LoadingProgress:  
 https://blog.csdn.net/qq_58213084/article/details/138597035
 onErrorReceive:  
 https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkweb/ts-basic-components-web.md
 
-
 ## 下拉实现刷新
 
 #### 注意
-刷新功能如果有个按钮，必须在onclick回调函数中调用`this.controller.refresh()`和`this.controller.pushUrl()`
+
+刷新功能如果有个按钮，必须在 onclick 回调函数中调用`this.controller.refresh()`和`this.controller.pushUrl()`
 
 #### 出现问题
-Refresh组件可以实现下拉刷新但是如果里面的唯一组件是Web则失败
+
+Refresh 组件可以实现下拉刷新但是如果里面的唯一组件是 Web 则失败
 
 #### 问题解答
+
 `Web` 组件无法下拉刷新的问题通常与组件的原生行为和框架支持有关。
 因为 `Web` 组件本身是一个独立的视图，不支持与 `Refresh` 组件的交互式刷新行为，而嵌入式浏览器视图在默认情况下不会响应诸如手势或父级容器的下拉刷新。
 
 #### 替代方案
+
 采用 `Button` 组件手动点击触发刷新事件
+
 ```typescript
 Stack() {
   // 页面标题
@@ -877,4 +900,92 @@ Stack() {
 ```
 
 #### 参考文档
+
 https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkweb/js-apis-webview.md#refresh
+
+## APP 无法实现安装下载
+
+#### 问题描述
+
+在应用商城项目中点击安装按钮，弹窗 `202 - permission denied, non-system app called system api. arkts`
+
+#### 问题分析
+
+App 为普通应用，无法调用系统 API 结构
+
+#### 解决方法
+
+在应用签名文件中设置应用为系统应用，即 app-feature 字段为 hos_system_app
+
+在 `OpenHarmony\Sdk\11\toolchains\lib\UnsgnedReleasedProfileTemplate.json` 中修改应用权限为`hos_system_app`
+
+```typescript
+	"bundle-info":{
+    ...
+		"apl":"system_core",
+		"app-feature":"hos_system_app"
+	},
+```
+
+#### 参考文档
+
+https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V3/ohos-auto-configuring-signature-information-0000001271659465-V3#section42735161005
+
+## 本地服务器映射到公网调试
+
+#### 使用背景
+
+在实机测试的时候需要将本地服务器映射到公网以便移动设备可以渲染出服务器数据
+
+#### 解决方法
+
+使用 `ngrok`, 跟着教程来即可
+
+https://dashboard.ngrok.com/get-started/setup/windows
+
+## 需要获取服务器 http 码来进行 UI 判断
+
+#### 需求背景
+
+应用商城需要一个 UI 界面来展示没有获取到服务器数据的情况
+
+#### 解决方案
+
+在`DataSource`里面建立一个异步获取`http`码的函数
+
+```typescript
+async fetchHttpCode(): Promise<number> {
+  try {
+    let httpRequest = http.createHttp();
+    const response = await new Promise<number>((resolve, reject) => {
+      httpRequest.request(ds_server, (err: Error, data: http.HttpResponse) => {
+        if (!err) {
+          resolve(data.responseCode);
+        } else {
+          reject(err);
+        }
+      });
+    });
+    return response; // 返回响应码
+  } catch (error) {
+    console.error('Error fetching HTTP code:', error);
+    return -1; // 返回一个错误码
+  }
+}
+```
+
+在 `aboutToAppear` 组件中调用`fetchHttopCode`获取状态码并将其赋值给页面定义的 UI 变量中即可使用
+
+```typescript
+aboutToAppear() {
+  const source = new DataSource()
+  source.fetchHttpCode().then((code) => {
+    this.res = code; // 更新状态变量以触发 UI 的重新渲染
+    if (code == 200) {
+      DataSource.getAppList(this.appType, (data: AppInfo[]) => {
+        this.appList = data;
+      })
+    }
+  });
+}
+```
