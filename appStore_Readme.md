@@ -1,51 +1,52 @@
 # AppStore API 11
 
-本文档展示了在构造基于 API9 Oniro 应用商城时遇到的问题
+This document presents the issues encountered when building an API9-based Oniro App Store.
 
-本文档使用 Deveco Studio 4.1 API version 11
+This document used Deveco Studio 4.1 API version 11
 
-1. [fonts 报错](#fonts报错)
-2. [语法适配 globalThis 无法使用 windowStage](#语法适配-globalthis-无法使用-windowstage)
-3. [resource 转 string 类型](#resource转string类型)
-4. [ArkTS-no-definite-assignment](#ArkTS-no-definite-assignment)
-5. [main_pages.json 页面必须有唯一入口](#main_pagesjson-页面必须有唯一入口)
-6. [语法适配 globalThis 无法使用 abilityContext.filesDir](#语法适配-globalthis-无法使用-abilitycontextfilesdir)
-7. [语法适配 for...in 无法使用](#语法适配-forin-无法使用)
-   - [第一个新的问题(ArkTS 遍历对象数组)](#第一个新的问题arkts-遍历对象数组)
-   - [第二个新的问题(Indexed access is not supported for fields)](#第二个新的问题indexed-access-is-not-supported-for-fields)
-8. [Object.assign 报错](#objectassign报错)
-9. [对象属性名称非标识符报错](#对象属性名称非标识符报错)
-10. [.catch(err)报错](#catcherr报错)
-11. [router 接收参数报错](#router接收参数报错)
+1. [fonts Occur Error](#fonts-occur-error)
+2. [Syntax Adaptation: `globalThis` cannot be used with `windowStage`](#syntax-adaptation-globalthis-cannot-be-used-with-windowstage)  
+3. [Resource to String Conversion](#resource-to-string-conversion)  
+4. [ArkTS-no-definite-assignment](#arkts-no-definite-assignment)  
+5. [main_pages.json Pages must have a unique entry](#main_pagesjson-pages-must-have-a-unique-entry)  
+6. [Syntax Adaptation: `globalThis` cannot be used with `abilityContext.filesDir`](#syntax-adaptation-globalthis-cannot-be-used-with-abilitycontextfilesdir)  
+7. [Syntax Adaptation: `for...in` cannot be used](#syntax-adaptation-forin-cannot-be-used)  
+   - [First new issue (ArkTS traversing object arrays)](#first-new-issue-arkts-traversing-object-arrays)  
+   - [Second new issue (Indexed access is not supported for fields)](#second-new-issue-indexed-access-is-not-supported-for-fields)  
+8. [Object.assign error](#objectassign-error)  
+9. [Error with non-identifier object property names](#error-with-non-identifier-object-property-names)  
+10. [`.catch(err)` error](#catcherr-error)  
+11. [Router parameter reception error](#router-parameter-reception-error)  
 
-实机测试发现的问题
+Issues found during real device testing
 
-1. [Web 组件无法通过参数渲染](#web组件无法通过参数渲染)
-2. [服务器数据无法渲染](#服务器数据无法渲染)
-3. [APP 无法实现安装下载](#app-无法实现安装下载)
-4. [需要获取服务器 http 码来进行 UI 判断](#需要获取服务器-http-码来进行-ui-判断)
+1. [Web component cannot be rendered with parameters](#web-component-cannot-be-rendered-with-parameters)  
+2. [Server data cannot be rendered](#server-data-cannot-be-rendered)  
+3. [App cannot implement installation and download](#app-cannot-implement-installation-and-download)  
+4. [Need to get the server HTTP code for UI decision](#need-to-get-the-server-http-code-for-ui-decision)
 
-项目开发新增需求
+New project development requirements
 
-1. [网页加载过程中需要缓冲组件和连接失败页面](#网页加载过程中需要缓冲组件和连接失败页面)
-2. [下拉实现刷新](#下拉实现刷新)
-3. [本地服务器映射到公网调试](#本地服务器映射到公网调试)
-4. [添加应用开始动画](#添加应用开始动画)
-5. [添加无法连接到服务器的UI](#添加无法连接到服务器的UI)
+1. [Need buffering component and connection failure page during webpage loading](#need-buffering-component-and-connection-failure-page-during-webpage-loading)  
+2. [Implement pull-to-refresh](#implement-pull-to-refresh)  
+3. [Map local server to public network for debugging](#map-local-server-to-public-network-for-debugging)
+4. [Add application start animation](#add-application-start-animation)
+5. [Add UI when can't connect to server](#add-ui-when-cannot-connect-to-server)
+
 # 项目优化
 
-## fonts 报错
+## fonts Occur Error
 
 ```
 > hvigor ERROR: Error occurred when ark compiling for previewer: ArkTS:ERROR File: C:/Users/c84381641/DevEcoStudioProjects/appStore_sample/entry/src/main/font/fonts.ets:4:15
  Object literal must correspond to some explicitly declared class or interface (arkts-no-untyped-obj-literals)
 ```
 
-#### 报错分析
+#### Error Analyze
 
-在`fonts.ets`文件中， 使用了未明确声明类型的对象字面变量(object literal)
+In the `fonts.ets` file, an object literal with an unspecified type was used.(object literal)
 
-ArkTS 要求所有对象字面量都必须与某个显式声明的类或接口对应，以确保**类型安全**
+ArkTS requires all object literals to correspond to an explicitly declared class or interface to ensure **type safety**.
 
 ```typescript
 //define fonts as lists of objects
@@ -83,9 +84,9 @@ const fonts = {
 export default fonts;
 ```
 
-#### 解决方法
+#### Solution
 
-为 `fonts` 对象字面量创建一个显式的接口
+Define the interface for the `fonts` object
 
 ```typescript
 // 定义 Font 接口
@@ -140,8 +141,8 @@ const fonts: Fonts = {
 export default fonts;
 ```
 
-> **Note** 在 ArkTS 中，不支持使用索引签名（indexed signatures）
-> 因此，不能使用像 [key: string]: Font(下面例子) 这样的语法来定义一个对象类型
+> **Note** In ArkTS, indexed signatures are not supported.  
+> Therefore, syntax like [key: string]: Font (in the example below) cannot be used to define an object type
 
 ```typescript
 // 定义 Fonts 对象的接口
@@ -150,7 +151,7 @@ interface Fonts {
 }
 ```
 
-> 为了避免使用索引签名，可以为每种字体显式定义其类型
+> To avoid using indexed signatures, you can explicitly define the type for each font.
 
 ```typescript
 // 定义具体的 Fonts 对象类型
@@ -165,31 +166,30 @@ interface Fonts {
 }
 ```
 
-## 语法适配 globalThis 无法使用 windowStage
+## Syntax Adaptation Globalthis Cannot Be Used With Windowstage
 
-#### 报错信息
+#### Error Message
 
 ![Alt text](appStore_image/problem_1.png)
 
-#### 参考文档
+#### References
 
 https://forums.openharmony.cn/forum.php?mod=viewthread&tid=1601
 
 https://segmentfault.com/q/1010000045214058
 
-由于无法为 globalThis 添加静态类型，只能通过查找的方式访问 globalThis 的属性，造成额外的性能开销。另外，无法为 globalThis 的属性标记类型，无法保证对这些属性操作的安全和高性能。因此 ArkTS 不支持 globalThis。
+Since static types cannot be added to `globalThis`, properties of `globalThis` can only be accessed through lookup, leading to additional performance overhead. Additionally, types cannot be assigned to `globalThis` properties, which makes it impossible to ensure safe and high-performance operations on these properties. Therefore, ArkTS does not support `globalThis`.
 
-建议按照业务逻辑根据 import/export 语法实现数据在不同模块的传递。
+It is recommended to implement data transfer across different modules according to business logic using the import/export syntax.
 
-必要情况下，可以通过构造的单例对象来实现全局对象的功能。(**说明：** 不能在 har 中定义单例对象，har 在打包时会在不同的 hap 中打包两份，无法实现单例。)
+If necessary, the functionality of a global object can be achieved by constructing a singleton object. (**Note:** Singleton objects cannot be defined in `har`, as `har` will package two copies in different `hap`s during packaging, making it impossible to achieve a true singleton.)
+#### Solution
 
-#### 解决方法
+##### Step 1
 
-##### 步骤一
+Store `windowStage` in a global UI variable within `entryability`.
 
-在 entryability 中将 windowStage 存储到全局 UI 变量中
-
-> 目前 windowStage 只在 onWindowStageCreate 中存在。获取需要使用 AppStorage。
+> Currently, `windowStage` only exists in `onWindowStageCreate`. To access it, use `AppStorage`.
 
 ```typescript
   onWindowStageCreate(windowStage: window.WindowStage): void {
@@ -209,9 +209,9 @@ https://segmentfault.com/q/1010000045214058
   }
 ```
 
-##### 步骤二
+##### Step 2
 
-在 `changeLFS` 函数中获取 windowStage 通过 `AppStorage.get` 方法
+In the `changeLFS` function, retrieve `windowStage` using the `AppStorage.get` method.
 
 ```typescript
   changeLFS() {
@@ -231,23 +231,24 @@ https://segmentfault.com/q/1010000045214058
   }
 ```
 
-#### 后续查验
+#### Subsequent verification
 
-在日志中发现在 `AppStorage` 中无法获取 `windowStage`, 怀疑是否是因为缺少模拟器或者真机
+The logs indicate that `windowStage` cannot be retrieved from `AppStorage`. It is suspected that this might be due to the absence of a simulator or physical device.
+
 ![Alt text](appStore_image/problem_1.1.png)
 
-## resource 转 string 类型
+## resource To String Conversion
 
-#### 报错信息
+#### Error Message
 
-某些组件的入参并不支持 `Resource` 类型
+The input parameters of certain components do not support the `Resource` type.
 ![Alt text](appStore_image/problem_2.png)
 
-#### 解决办法
+#### Solution
 
-##### 第一步
+##### Step 1
 
-在组件中封装 ResourceToString 方法
+Wrap the `ResourceToString` method within the component.
 
 ```typescript
   ResourceToString(resource:Resource):string{
@@ -255,36 +256,36 @@ https://segmentfault.com/q/1010000045214058
   }
 ```
 
-##### 第二步
+##### Step 2
 
-直接在需要的地方调用
+Call it directly where needed.
 
 ```typescript
 Search().searchButton(this.ResourceToString($r("app.string.search")));
 ```
 
-### 参考文档
+### Reference
 
-**ArkTs 的资源 Resource 类型怎么转为 string:**
+**How to convert the Resource type to string in ArkTS:**
 https://blog.csdn.net/gsrkuang/article/details/136773584?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-136773584-blog-134664276.235%5Ev43%5Epc_blog_bottom_relevance_base2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-136773584-blog-134664276.235%5Ev43%5Epc_blog_bottom_relevance_base2&utm_relevant_index=5
 
-#### 后续查验
+#### Subsequent verification
 
-部分功能是 mock 实现，需要真机查验
+Some functions are implemented as mocks and require verification on a real device.
 ![Alt text](appStore_image/problem_2.1.png)
 
 ## ArkTS-no-definite-assignment
 
-#### 报错信息
+#### Error Information
 
-ArkTS 编译的时候有一些警告，例如下面这种变量定义的!语法，会有警告
+When compiling ArkTS, there are some warnings, such as the `!` syntax in variable definitions, which generates warnings.
 ![Alt text](appStore_image/problem_3.png)
 
-#### 解决办法
+#### Solution
 
-官方的解决办法是在定义的时候或者构造函数的时候进行初始化，但是有些对象类型是 Interface 或者 type，这种类型进行初始化推荐用 null 的方式去初始化对象类型，但使用的地方需要判空
+The official solution is to initialize variables either at the time of definition or in the constructor. However, some object types are Interface or type, and it's recommended to initialize these with null. When using them, a null check is required.
 
-对象类型用 null 进行初始化例子：
+Example of initializing an object type with null:
 
 ```typescript
 private applicationContext: common.ApplicationContext|null=null;
@@ -293,30 +294,29 @@ private uiContext: UIContext|null=null;
 private windowStage: window.WindowStage|null=null;
 ```
 
-对于判空的地方太多这个问题，目前没有优化方案，增加判空是为了安全性考虑，如果缺少判空，后续可能会遇到崩溃
+For the issue of having too many null checks, there is currently no optimization solution. The additional null checks are for safety reasons; missing a null check may lead to crashes later.
 
-告警目前规格是无法配置消除
+The current warning specifications cannot be configured to suppress these warnings.
 
-### 参考文档
+### References
 
-**ArkTS 警告处理最佳实践**:
+**ArkTS Warning Handling Best Implementation**:
 https://segmentfault.com/q/1010000045206935
 
-## main_pages.json 页面必须有唯一入口
+## main_pages.json Pages Must Have A Unique Entry
 
-#### 报错信息
+#### Error Message
 
-每个声明在 `model_json.ets` 中的页面必须且唯一有一个入口装饰器  
+Each page declared in `model_json.ets` must have one and only one entry decorator. 
 <img src='appStore_image/problem_4.png' width="500">
 
-#### 解决办法
+#### Solution
 
-##### 步骤一
+##### Step 1
 
-移除在 `main_json.ets` 文件中不需要的入口的页面
+Remove unnecessary entry pages in the `main_json.ets` file.
 
-下面的例子中移除掉 `"pages/SettingPage"`
-
+In the example below, remove `"pages/SettingPage"`
 ```typescript
 {
   "src": [
@@ -327,27 +327,27 @@ https://segmentfault.com/q/1010000045206935
 }
 ```
 
-##### 步骤二
+##### Step 2
 
-确保 `SettingPage` 中不存在 `@Entry` 入口装饰器
+Ensure that there is no `@Entry` decorator in `SettingPage`.
 
-### 参考文档
+### Reference
 
 https://segmentfault.com/q/1010000045049039
 
-## 语法适配 globalThis 无法使用 abilityContext.filesDir
+## Syntax Adaptation: `globalThis` cannot be used with `abilityContext.filesDir`
 
-#### 报错信息
+#### Error Message
 
-类似于上面 Problem 4, globalThis 无法使用
+Similar to Problem 4 above, `globalThis` cannot be used.
 
-#### 解决方法
+#### Solution
 
-使用 AppStorage 方法的位置不同
+The usage location of the `AppStorage` method varies.
 
-##### 步骤一
+##### Step 1
 
-在 `EntryAbility.ets` 文件中存储 `filesDir`
+Store `filesDir` in the `EntryAbility.ets` file.
 
 ```typescript
 export default class EntryAbility extends UIAbility {
@@ -360,9 +360,9 @@ export default class EntryAbility extends UIAbility {
 }
 ```
 
-##### 步骤二
+##### Step 2
 
-在需要的方法中声明 filesDir 变量并将 AppStorage 中的数据存放进去， 然后在需要的地方使用即可
+Declare the `filesDir` variable in the required method and store the data from `AppStorage` in it, then use it where needed.
 
 ```typescript
   clearCache() {
@@ -389,15 +389,15 @@ export default class EntryAbility extends UIAbility {
   }
 ```
 
-## 语法适配 for...in 无法使用
+## Syntax Adaptation: `for...in` cannot be used
 
-#### 报错信息
+#### Error Message
 
 <img src='appStore_image/problem_6.png' width="500">
 
-#### 解决 for...in 不兼容方法
+#### Solve 'for...in' not compatible problem
 
-由于在 ArkTS 中，对象布局在编译时是确定的、并且不能在运行时被改变，所以不支持使用 for … in 迭代一个对象的属性。对于数组来说，可以使用常规的 for 循环
+In ArkTS, object layouts are fixed at compile time and cannot be changed at runtime, so using `for...in` to iterate over an object's properties is not supported. For arrays, you can use a regular `for` loop.
 
 - Typescript
 
@@ -417,16 +417,16 @@ for (let i = 0; i < a.length; ++i) {
 }
 ```
 
-#### 第一个新的问题(ArkTS 遍历对象数组)
+#### First new issue (ArkTS traversing object arrays)
 
-由于项目中定义的 `fonts` 不是数组而是对象，所以不可以 for 循环遍历  
+Since `fonts` in the project is defined as an object rather than an array, a for loop cannot be used to iterate over it.
 <img src='appStore_image/problem_6.1.png' width="500">
 
-#### 解决方案
+#### Solution
 
-要遍历 object 和 Record 这种类型的对象可以使用 `Object.keys()` 方法获取对象的所有属性，并进行遍历
+To iterate over objects of types like `object` and `Record`, you can use the `Object.keys()` method to get all properties of the object and then iterate over them.
 
-##### 举例
+##### For instance
 
 ```typescript
 const obj = { a: 1, b: 2, c: 3 };
@@ -436,7 +436,7 @@ Object.keys(obj).forEach((key) => {
 });
 ```
 
-##### 修改前
+##### Before modification
 
 ```typescript
 export const registerAllFonts = () => {
@@ -450,7 +450,7 @@ export const registerAllFonts = () => {
 };
 ```
 
-##### 修改后
+##### After modification
 
 ```typescript
 export const registerAllFonts = () => {
@@ -465,22 +465,22 @@ export const registerAllFonts = () => {
 };
 ```
 
-#### 第二个新的问题(Indexed access is not supported for fields)
+#### Second new issue (Indexed access is not supported for fields)
 
-经过初步代码修改，发现仍然报错， 信息如下  
+After preliminary code modifications, an error is still reported. The information is as follows: 
 <img src='appStore_image/problem_6.2.png' width="500">
 
-相同的问题在 `AppInfo.ets` 中也出现了
+The same issue also appeared in `AppInfo.ets`.
 
 <img src='appStore_image/problem_9.png' width="500">
 
-##### 解决方法
+##### Solution
 
-可以使用 `Object(item)[key]` 或者 `JSON.parse(JSON.stringify(item))[key]`
+We can use `Object(item)[key]` or `JSON.parse(JSON.stringify(item))[key]`
 
-##### 最终的代码
+##### Final Code
 
-采取了 ` Object(item)[key]` 的方式
+I took ` Object(item)[key]`
 
 ```typescript
 export const registerAllFonts = () => {
@@ -495,26 +495,26 @@ export const registerAllFonts = () => {
 };
 ```
 
-#### 参考文档
+#### References
 
-ArkTS 不支持 for … in 的适配规则：
+ArkTS does not support the following adaptation rules for `for...in`:
 https://ost.51cto.com/posts/29738
 
-ArkTS 中如何遍历对象：
+How to iterate over objects in ArkTS:
 https://segmentfault.com/q/1010000044602257
 
-访问对象值的报错问题：
+Error issue when accessing object values:
 https://blog.csdn.net/qq_54418719/article/details/140772066?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ECtr-2-140772066-blog-135171005.235%5Ev43%5Epc_blog_bottom_relevance_base2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ECtr-2-140772066-blog-135171005.235%5Ev43%5Epc_blog_bottom_relevance_base2&utm_relevant_index=5
 
-## Object.assign 报错
+## Object.assign error
 
-#### 报错信息
+#### Error Message
 
 <img src='appStore_image/problem_7.png' width="600">
 
-#### 解决方法
+#### Solution
 
-在 ts 文件中封装一个工具类，然后在 ets 中引入使用。(把原文件换成 ts 文件，再 ets 中引入)
+Wrap a utility class in a `.ts` file, then import and use it in an `.ets` file. (Replace the original file with a `.ts` file, then import it in the `.ets` file.)
 
 ```typescript
 export class ObjectUtils {
@@ -530,15 +530,15 @@ export class ObjectUtils {
 }
 ```
 
-#### 新的问题
+#### New Problem
 
-引入 ObjectUtils 后出现新的报错
-不能把 Partial<Object>类型的变量作为对象类型
+New problem after importing `ObjectUtils`
+A variable of type `Partial<Object>` cannot be used as an object type.
 <img src='appStore_image/problem_7.1.png' width="600">
 
-##### 解决方法
+##### Solution
 
-使用 `as` 进行强制类型转换
+Using `as` performing a type assertion (type casting).
 
 ```typescript
 import { ObjectUtils } from "../utils/ObjectUtils";
@@ -556,7 +556,7 @@ class HomePageData {
 export { HomePageData };
 ```
 
-#### 参考文档
+#### References
 
 HarmonyOS Object.assign\(target, source\)报错问题：
 https://segmentfault.com/q/1010000045208468
@@ -564,26 +564,26 @@ https://segmentfault.com/q/1010000045208468
 Argument of type partial is not assignable to parameter of type:
 https://stackoverflow.com/questions/63507831/argument-of-type-partial-is-not-assignable-to-parameter-of-type
 
-## 对象属性名称非标识符报错
+## Error with non-identifier object property names
 
-#### 报错信息
+#### Error Message
 
-有两个报错：
+There are 2 error messages：
 
-- arkts-no-untyped-obj-literals：对象文字必须对应某个显式声明的类或接口
-- arkts-identifiers-as-prop-names：对象属性名称必须是标识符，不能是非标识符字符串。
+- arkts-no-untyped-obj-literals：Object literals must correspond to an explicitly declared class or interface.
+- arkts-identifiers-as-prop-names：Object property names must be identifiers and cannot be non-identifier strings.
 
 <img src='appStore_image/problem_8.png' width="600">
 
-#### 解决方法
+#### Solution
 
-ArkTSCheck 中的 `arkts-identifiers-as-prop-names` 规则不允许对象属性名称使用非标识符（如中文字符、空格等）。由于 `AppActionText` 枚举值包含中文字符，直接将它们用作对象的键会触发该规则。
+The `arkts-identifiers-as-prop-names` rule in ArkTSCheck does not allow object property names to use non-identifiers (such as Chinese characters, spaces, etc.). Since the `AppActionText` enum values contain Chinese characters, directly using them as object keys triggers this rule.
 
-我使用的解决方案是创建一个映射类型，将枚举值转换为标识符友好的英文键
+The solution I used is to create a mapping type that converts the enum values into identifier-friendly English keys.
 
-##### 步骤一
+##### Step 1
 
-定义 `ActionTextMap` 接口，替代对象字面量类型
+Define `ActionTextMap` interface to replace an object literal type
 
 ```typescript
 interface ActionTextMap {
@@ -593,9 +593,9 @@ interface ActionTextMap {
 }
 ```
 
-##### 步骤二
+##### Step 2
 
-使用 `ActionTextMap` 接口声明 `actionTextMap` 对象
+Using `ActionTextMap` interface declaration `actionTextMap` Object
 
 ```typescript
 const actionTextMap: ActionTextMap = {
@@ -605,9 +605,9 @@ const actionTextMap: ActionTextMap = {
 };
 ```
 
-##### 步骤三
+##### Step 3
 
-定义 `classes` 对象，使用标识符友好的键名
+Define `classes` object，using friend key
 
 ```typescript
 const classes: AppActionClasses = {
@@ -621,23 +621,23 @@ const classes: AppActionClasses = {
 };
 ```
 
-#### 参考文档
+#### References
 
 https://blog.csdn.net/yuanlaile/article/details/139123015
 
 https://segmentfault.com/a/1190000044588922
 
-## .catch(err)报错
+## `.catch(err)` error
 
-#### 报错信息
+#### Error Message
 
 arkts-no-any-unknown
 
 <img src='appStore_image/problem_10.png' width="500">
 
-#### 解决方法
+#### Solution
 
-存在没有声明具体类型的变量，常见于`try-catch`中的`err`，可以将它声明为`BussinessError`
+There are variables that are not explicitly typed, commonly seen in try-catch blocks, such as the err variable. You can declare it as `BusinessError`.
 
 ```typescript
 import { BusinessError } from '@ohos.base';
@@ -650,16 +650,16 @@ import { BusinessError } from '@ohos.base';
 };
 ```
 
-#### 参考文档
+#### References
 
 https://blog.csdn.net/lz8362/article/details/135171005
 
-## router 接收参数报错
+## Router parameter reception error
 
-#### 报错信息
+#### Error Message
 
 <img src='appStore_image/problem_11.png' width="600">
-通过路由传入页面的参数列表如下：
+The list of parameters passed to the page via the route is as follows:
 
 ```typescript
 router.pushUrl({
@@ -668,11 +668,11 @@ router.pushUrl({
 });
 ```
 
-#### 解决方法
+#### Solution
 
-##### 步骤一
+##### Step 1
 
-自定义接口类型
+Custom interface type
 
 ```typescript
 interface RouterParams {
@@ -681,9 +681,9 @@ interface RouterParams {
 }
 ```
 
-##### 步骤二
+##### Step 2
 
-通过 `as Type` 的方式获取参数
+use the `as Type` syntax to cast the parameters to a specific type.
 
 ```typescript
 const params = router.getParams() as RouterParams;
@@ -691,23 +691,23 @@ this.appInfo = new AppInfo(params.appInfo);
 this.localVersionName = params.localVersionName;
 ```
 
-#### 参考文档
+#### References
 
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/ui/arkts-routing.md
 
-## Web 组件无法通过参数渲染
+## Web component cannot be rendered with parameters
 
-#### 情景描述
+#### Case Background
 
-创建的 `Web` 组件在初始化参数中无法进行动态渲染
+The `Web` component created cannot dynamically render parameters in the initialization.
 
 ```typescript
 Web({ src: this.url, controller: this.controller }); //这里的src如果我们传入具体的url字符串则可以渲染网页
 ```
 
-#### 解决方法
+#### Solution
 
-通过控制器的 `loadUrl` 接口将此 Web 组件显示页面变更
+Use the controller's `loadUrl` interface to change the displayed page of this Web component.
 
 ```typescript
 import webview from "@ohos.web.webview";
@@ -722,33 +722,33 @@ Web({ src: this.url, controller: this.controller }).onControllerAttached(() => {
 });
 ```
 
-#### 参考文档
+#### Reference
 
 https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/web/web-page-loading-with-web-components.md
 
-## 服务器数据无法渲染
+## Server data cannot be rendered
 
-#### 出现问题
+#### Case Situation
 
-本地运行的服务器可以在预览器渲染但是实机不行，原因是因为实机没有通过网络连接到远程服务器，需要用过`ssh`连接到本地服务器然后输入`docker`命令
+The local server can render in the previewer but not on the real device because the real device is not connected to the remote server over the network. You need to connect to the local server via `ssh` and then run the `docker` command.
 
 ```typescript
 docker run -d -p 5000:5000 gowokegobroke/oniro-data:latest
 ```
 
-这样所有设备都可以连接到服务器，确保实机里连接了网络
+This way, all devices can connect to the server, ensuring that the real device is connected to the network.
 
-## 网页加载过程中需要缓冲组件和连接失败页面
+## Need buffering component and connection failure page during webpage loading
 
-### 缓冲组件
+###  buffering component
 
-- 定义状态变量 `isLoading`
+- Define state variable `isLoading`
 
 ```typescript
   @State isLoading: boolean = false
 ```
 
-- 条件判断`isLoading`状态是否渲染缓冲动画
+- Conditional judgement `isLoading` whether to render the buffering animation based on the state.
 
 ```typescript
   if (this.isLoading) {
@@ -763,7 +763,7 @@ docker run -d -p 5000:5000 gowokegobroke/oniro-data:latest
   }
 ```
 
-- 在页面出现之前渲染缓冲动画
+- Render the buffering animation before the page appears.
 
 ```typescript
   //执行其build()函数之前执行
@@ -772,7 +772,7 @@ docker run -d -p 5000:5000 gowokegobroke/oniro-data:latest
   }
 ```
 
-- 在 Web 组件开始渲染的时候隐藏缓冲动画
+- Hide the buffering animation when the Web component starts rendering.
 
 ```typescript
 Web({ src: this.url, controller: this.controller }).onPageBegin((event) => {
@@ -780,15 +780,15 @@ Web({ src: this.url, controller: this.controller }).onPageBegin((event) => {
 });
 ```
 
-### 连接失败页面
+### Add Connection Failure UI Page
 
-- 定义状态变量 `isHttpError`
+- Define state variable `isHttpError`
 
 ```typescript
 @State isHttpError: boolean = false
 ```
 
-- 定义无网络组件
+- Define no internet component
 
 ```typescript
 if (this.isHttpError) {
@@ -825,7 +825,7 @@ if (this.isHttpError) {
 }
 ```
 
-- 在 Web 组件`onErrorReceive`属性中控制状态变量
+- in Web component `onErrorReceive` control the state variable within properties.
 
 ```typescript
 .onErrorReceive((event)=>{
@@ -835,31 +835,30 @@ if (this.isHttpError) {
 })
 ```
 
-#### 参考文档
+#### References
 
 LoadingProgress:  
 https://blog.csdn.net/qq_58213084/article/details/138597035
 onErrorReceive:  
 https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkweb/ts-basic-components-web.md
 
-## 下拉实现刷新
+## Implement pull-to-refresh
 
-#### 注意
+#### Attention
 
-刷新功能如果有个按钮，必须在 onclick 回调函数中调用`this.controller.refresh()`和`this.controller.pushUrl()`
+If there is a button for the refresh functionality, you must call `this.controller.refresh()` and `this.controller.pushUrl()` within the onclick callback function to trigger the `refresh` and `update` the URL accordingly.
 
-#### 出现问题
+#### Problem
 
-Refresh 组件可以实现下拉刷新但是如果里面的唯一组件是 Web 则失败
+The Refresh component can implement pull-to-refresh functionality, but if the only component inside it is a `Web` component, it may fail due to the `Web` component's rendering behavior or lifecycle issues related to the refresh interaction.
 
-#### 问题解答
+#### Explaination
 
-`Web` 组件无法下拉刷新的问题通常与组件的原生行为和框架支持有关。
-因为 `Web` 组件本身是一个独立的视图，不支持与 `Refresh` 组件的交互式刷新行为，而嵌入式浏览器视图在默认情况下不会响应诸如手势或父级容器的下拉刷新。
+The issue where the `Web` component does not support pull-to-refresh typically relates to the native behavior of the component and the framework’s support for such interactions. Since the Web component is a standalone view, it does not natively support interactive refresh behaviors like those from the Refresh component. Embedded browser views, by default, do not respond to gestures or pull-to-refresh actions from their parent container.
 
-#### 替代方案
+#### Substitution solution
 
-采用 `Button` 组件手动点击触发刷新事件
+Adding `Button` component to manually trigger a refresh event through a button click
 
 ```typescript
 Stack() {
@@ -900,25 +899,25 @@ Stack() {
 .alignContent(Alignment.End)
 ```
 
-#### 参考文档
+#### References
 
 https://docs.openharmony.cn/pages/v5.0/zh-cn/application-dev/reference/apis-arkweb/js-apis-webview.md#refresh
 
-## APP 无法实现安装下载
+## App cannot implement installation and download
 
-#### 问题描述
+#### Problem Description
 
-在应用商城项目中点击安装按钮，弹窗 `202 - permission denied, non-system app called system api. arkts`
+In the app store project, click the install button to show a popup window `202 - permission denied, non-system app called system api. arkts`
 
-#### 问题分析
+#### Problem Analyze
 
-App 为普通应用，无法调用系统 API 结构
+App is normal app，can't call system API
 
-#### 解决方法
+#### Solution
 
-在应用签名文件中设置应用为系统应用，即 app-feature 字段为 hos_system_app
+In the application signature file, set the application as a system app by setting the `app-feature` field to `hos_system_app`.
 
-在 `OpenHarmony\Sdk\11\toolchains\lib\UnsgnedReleasedProfileTemplate.json` 中修改应用权限为`hos_system_app`
+In `OpenHarmony\Sdk\11\toolchains\lib\UnsgnedReleasedProfileTemplate.json` change application level into `hos_system_app`
 
 ```typescript
 	"bundle-info":{
@@ -927,34 +926,31 @@ App 为普通应用，无法调用系统 API 结构
 		"app-feature":"hos_system_app"
 	},
 ```
-> **注意:**
-如果切换完系统权限无效，可以尝试重新生成自动签名文件
-
-#### 参考文档
+> **Attention:**
+If it's invalid after changing the level, try to automaticlly generate the signing file
+#### Reference
 
 https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V3/ohos-auto-configuring-signature-information-0000001271659465-V3#section42735161005
 
-## 本地服务器映射到公网调试
+## Map local server to public network for debugging
 
-#### 使用背景
+#### Usage background
+During real device testing, you need to map the local server to the public network so that the mobile device can render data from the server.
+#### Solution
 
-在实机测试的时候需要将本地服务器映射到公网以便移动设备可以渲染出服务器数据
-
-#### 解决方法
-
-使用 `ngrok`, 跟着教程来即可
+Using `ngrok`, following the tutorial is fine
 
 https://dashboard.ngrok.com/get-started/setup/windows
 
-## 需要获取服务器 http 码来进行 UI 判断
+## Need to get the server HTTP code for UI decision
 
-#### 需求背景
+#### Requirement Background
 
-应用商城需要一个 UI 界面来展示没有获取到服务器数据的情况
+The app store needs a UI interface to display the situation when server data cannot be retrieved.
 
-#### 解决方案
+#### Solution
 
-在`DataSource`里面建立一个异步获取`http`码的函数
+In `DataSource` make an aync `http` code function
 
 ```typescript
 async fetchHttpCode(): Promise<number> {
@@ -977,7 +973,7 @@ async fetchHttpCode(): Promise<number> {
 }
 ```
 
-在 `aboutToAppear` 组件中调用`fetchHttopCode`获取状态码并将其赋值给页面定义的 UI 变量中即可使用
+In `aboutToAppear` component call `fetchHttopCode` get the status code and assign it to the UI variable defined on the page for use.
 
 ```typescript
 aboutToAppear() {
@@ -992,3 +988,88 @@ aboutToAppear() {
   });
 }
 ```
+
+## Add application start animation
+```typescript
+import router from '@ohos.router';
+
+@Entry
+@Component
+struct SplashPage {
+  @State flag: boolean = false;
+
+  onPageShow(): void {
+    animateTo({
+      duration: 2000,
+      onFinish:()=>{
+        //when the animation finish go the main page
+        setTimeout(()=>{
+          router.replaceUrl({url: 'pages/Index'})
+        }, 200)
+      }
+    }, () => {
+      this.flag = true
+    })
+  }
+
+  build() {
+    Column() {
+      if (this.flag) {
+        Image($r('app.media.ONIRO'))
+          .logoStyle()
+          .transition({
+            type: TransitionType.Insert,
+            opacity: 0,
+            translate: { x: -150 },
+            scale:{
+              x:5,
+              y:5
+            }
+          })
+        Text($r('app.string.oniro_appStore'))
+          .titleStyle()
+          .transition({
+            type: TransitionType.Insert,
+            opacity: 0,
+            translate: { x: 150 }
+          })
+      }
+      Blank()
+    }
+    .bgStyle()
+  }
+}
+
+@Extend(Image)
+function logoStyle() {
+  .width(90)
+  .height(90)
+  .margin({ top: 120 })
+}
+
+@Extend(Text)
+function titleStyle() {
+  .fontSize(21)
+  .fontColor(Color.Black)
+  .fontWeight(FontWeight.Bold)
+  .margin({ top: 15 })
+}
+
+@Styles
+function bgStyle() {
+  .width('100%')
+  .height('100%')
+  .backgroundColor(Color.White)
+  .backgroundImageSize({ width: '100%', height: '100%' })
+}
+
+@Extend(Text)
+function footerStyle() {
+  .fontSize(12)
+  .fontColor('#ff7ba416')
+  .fontWeight(FontWeight.Bold)
+  .margin({ bottom: 30 })
+}
+```
+## Add UI when cannot connect to server
+<img src='appStore_image/problem_12.png' width="600">
