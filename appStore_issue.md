@@ -32,6 +32,9 @@
 3. [本地服务器映射到公网调试](#本地服务器映射到公网调试)
 4. [添加应用开始动画](#添加应用开始动画)
 5. [添加无法连接到服务器的UI](#添加无法连接到服务器的UI)
+
+项目Fork
+   [Fork应用商店项目](#fork应用商店项目)
 # 项目优化
 
 ## fonts 报错
@@ -992,3 +995,25 @@ aboutToAppear() {
   });
 }
 ```
+
+## Fork应用商店项目
+#### 应用场景
+应用商店修改完成，需要合并到初始仓库
+
+#### Fork过程
+ - 1. 在F-OH 仓库中点击Fork，在自己账户下创建仓库的拷贝
+ - 2. 使用 `git clone` 将仓库复制到本地
+ - 3. 将自己修改好的代码替换掉原始的代码
+ >**注意:**
+ 需要在git commit的时候添加sign off签名
+ ```typescript
+ git commit --signoff -m "comment内容"
+ ```
+ >**注意：**
+ 在F-OH项目中signoff的签名邮箱必须是自己的elipse account，如果不是的话需要通过`git config`自行设置
+ ```typescript
+git config --global user.email "youremail"
+ ```
+  - 4. 最后将代码`git push`到远程自己fork的仓库
+  - 5. 在github repo中点击`Contribute`->`Open pull request`, 将所有的改进操作写在commit中 发起PR申请，在AppStore的项目中F-OH初始仓库单独创建了一个分支，在提交PR的时候选择这个独立的分支来控制项目的版本化
+  - 6. 待审核人审核完毕结束
