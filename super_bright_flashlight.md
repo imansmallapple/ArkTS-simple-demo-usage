@@ -10,8 +10,9 @@ Application development general process
 
 Problems encountered during development
 
-[To run and debug the Harmony device configure the HarmonyOS runtime](#to-run-and-debug-then-harmony-device-configure-the-harmonyos-runtime)
-[Change the HarmonyOS project back to OpenHarmony](#change-the-harmonyos-project-back-to-openharmony)
+1. [To run and debug the Harmony device configure the HarmonyOS runtime](#to-run-and-debug-then-harmony-device-configure-the-harmonyos-runtime)
+
+2. [Change the HarmonyOS project back to OpenHarmony](#change-the-harmonyos-project-back-to-openharmony)
 
 ## General Process
 This part introduces the general process of the application development  
