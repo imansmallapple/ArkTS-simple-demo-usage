@@ -1,6 +1,10 @@
 # Super Bright FlashLight
 This is a documentation lists all the problems or noticeable thing during the app development.
 
+### Table of content
+
+Application development general process
+
 [General Process](#general-process)
 
 Problems encountered during development
@@ -8,6 +12,105 @@ Problems encountered during development
 [To run and debug the Harmony device configure the HarmonyOS runtime](#to-run-and-debug-then-harmony-device-configure-the-harmonyos-runtime)
 
 ## General Process
+This part introduces the general process of the application development  
+1. [UI design and implement](#ui-design-and-implement)
+2. [Logic and functionailities](#logic-and-functionailities)
+3. [Check and testing](#check-and-testing)
+4. [App display and acceptance](#app-display-and-acceptance)
+5. [Merge to applist and finish](#merge-to-applist-and-finish)
+
+
+### UI Design and Implement
+ - Take the example of `Super Bright FlashLight`, we are aiming to design the app with user-friendly interface. Comunicate with UI/UX colleague and got the basic construction idea.
+
+- After that, start to build the UI part, 
+my idea is to construct the UI with very simple containers(Like placing columns/rows with a different color to make a general position layout)
+
+- Then, start to replce each component with the containers
+> In my case I need to place a flashlight image as background, and a `fragemented slider` to control the flashlight's brightness, so choose `Stack` as the basic container.
+
+### Logic and functionailities
+- After basic logic constrcution we can start to write the logic part.
+> **Note**  
+> There is some basic logic code within UI part, general it's inside the callback function of some `User-interacting Component like Button(), Slider(), TextInput() and etc.`
+
+- The `User-interacting UI component` can control the UI variables which defined inside the struct.
+
+```typescript
+@Entry
+@Component
+struct Index{
+@State isOn: boolean = false
+  build(){
+    Button('Click')
+    .onClick(()=>{
+    this.isOn = this.isOn ? true : false
+    })
+  }
+}
+```
+>**Note**  
+> We need to define the UI state variable within `struct`, and to update it in `callback` functions.  
+
+>**Start fullfilling the callback function with some basic `console.info()` about the operation, then add the more concrete logic afterwords.**
+
+
+- For most of other logic like `flashlight api calls` create another folder under `src/main/ets` maybe name it as `Api`
+
+- Using `import and export` to pass the logic function between UI.
+
+```typescript
+// ets/Api
+
+// Get camera manager instance
+export default function getCameraManager(context: common.BaseContext): camera.CameraManager | undefined {
+  let cameraManager: camera.CameraManager | undefined = undefined;
+  try {
+    cameraManager = camera.getCameraManager(context);
+  } catch (error) {
+    let err = error as BusinessError;
+    console.error(`The getCameraManager call failed. error code: ${err.code}`);
+  }
+  return cameraManager;
+}
+```
+
+```typescript
+//Your UI page
+import getCameraManager from './Api'
+
+@Entry
+@Component
+struct index{
+      private cameraManager: camera.CameraManager = getCameraManager(getContext(this)) as camera.CameraManager
+      build(){
+      }
+}
+```
+> **Note**  
+> In such case you can call the `GetCameraManager` function from your `Api` folder.
+
+### Check and Testing
+- I use console/hilog to check the program works fine or not. Most of the UI part can be tested in `Previewer`
+, some functionailities can be tested in `Emulator` like `App Stages, Web component, http interaction`, and some functionailities can be tested only on real development board like `Camera, flashlight` which exists only on real device.
+
+### App Display and Acceptance
+
+CONTENT TO BE ADDED
+
+
+
+
+
+
+### Merge To Applist and Finish
+
+CONTENT TO BE ADDED
+
+
+
+
+
 
 ## To run and debug the Harmony device configure the HarmonyOS runtime
 
