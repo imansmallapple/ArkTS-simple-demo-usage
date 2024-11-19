@@ -23,8 +23,8 @@
 1. [Web 组件无法通过参数渲染](#web组件无法通过参数渲染)
 2. [服务器数据无法渲染](#服务器数据无法渲染)
 3. [APP 无法实现安装下载](#app-无法实现安装下载)
-4. [需要获取服务器 http 码来进行 UI 判断](#需要获取服务器-http-码来进行-ui-判断)
-
+4. [需要获取服务器 http 码来进行 UI 判断](#需要获取服务器-http-码来进行-ui-判断)  
+5. [Hap signature fails to be verified](#hap-signature-fails-to-be-verified)
 项目开发新增需求
 
 1. [网页加载过程中需要缓冲组件和连接失败页面](#网页加载过程中需要缓冲组件和连接失败页面)
@@ -1017,3 +1017,9 @@ git config --global user.email "youremail"
   - 4. 最后将代码`git push`到远程自己fork的仓库
   - 5. 在github repo中点击`Contribute`->`Open pull request`, 将所有的改进操作写在commit中 发起PR申请，在AppStore的项目中F-OH初始仓库单独创建了一个分支，在提交PR的时候选择这个独立的分支来控制项目的版本化
   - 6. 待审核人审核完毕结束
+
+  ## Hap signature fails to be verified
+
+#### 参考文档
+7700011 签名校验失败导致应用安装失败：  
+  https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/reference/apis-ability-kit/errorcode-bundle.md

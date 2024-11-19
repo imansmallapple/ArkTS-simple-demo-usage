@@ -6,7 +6,8 @@ This is a documentation lists all the problems or noticeable thing during the ap
 
 Application development general process
 
-[General Process](#general-process)
+1. [General Process](#general-process)
+2. [UI Resources](#ui-resources)
 
 Problems encountered during development
 
@@ -21,7 +22,9 @@ This part introduces the general process of the application development
 3. [Check and testing](#check-and-testing)
 4. [App display and acceptance](#app-display-and-acceptance)
 5. [Merge to applist and finish](#merge-to-applist-and-finish)
+## UI Resources
 
+We need 
 
 ### UI Design and Implement
  - Take the example of `Super Bright FlashLight`, we are aiming to design the app with user-friendly interface. Comunicate with UI/UX colleague and got the basic construction idea.
@@ -96,6 +99,20 @@ struct index{
 ### Check and Testing
 - I use console/hilog to check the program works fine or not. Most of the UI part can be tested in `Previewer`
 , some functionailities can be tested in `Emulator` like `App Stages, Web component, http interaction`, and some functionailities can be tested only on real development board like `Camera, flashlight` which exists only on real device.
+
+#### Problem 1: Connect OpenHarmony phone shows `no device`
+After connecting `OpenHarmony` board, it shows `no device` on Deveco Studio. But in the terminal type `hdc list targets` it shows the connected device series number.
+
+> Solution: Reinstall pervious same Deveco studio version and run the sync again.
+
+#### Problem 2: `"current device not support flashLight"`
+
+#### My suspection: Didn't install PERMISSION
+After concrete debugging and checking, it's still the device problem.
+So for this application I keep only simple demo with UI functionalities.
+
+#### After remove api testing page, the real device rendered with blank page
+
 
 ### App Display and Acceptance
 
