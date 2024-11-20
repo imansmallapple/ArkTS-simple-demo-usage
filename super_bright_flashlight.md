@@ -11,7 +11,7 @@ Application development general process
 
 Problems encountered during development
 
-1. [To run and debug the Harmony device configure the HarmonyOS runtime](#to-run-and-debug-then-harmony-device-configure-the-harmonyos-runtime)
+1. [To run and debug the Harmony device configure the HarmonyOS runtime](#to-run-and-debug-the-harmony-device-configure-the-harmonyos-runtime)
 
 2. [Change the HarmonyOS project back to OpenHarmony](#change-the-harmonyos-project-back-to-openharmony)
 
@@ -113,6 +113,9 @@ After connecting `OpenHarmony` board, it shows `no device` on Deveco Studio. But
 #### My suspection: Didn't install PERMISSION
 After concrete debugging and checking, it's still the device problem.
 So for this application I keep only simple demo with UI functionalities.
+
+**Update information**
+> I tested the api with HarmonyOS device and it worked, so I keep these functionailities and attached to the button.
 
 #### After remove api testing page, the real device rendered with blank page
 
