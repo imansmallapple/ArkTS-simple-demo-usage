@@ -1,4 +1,6 @@
 # Table of content
+**Guys, if you are watching this doc please wait since the remote server of the appStore data still have something left to do.**
+
 
 [Deploy project on Docker](#deploy-project-on-docker)  
 [Common Docker command](#common-docker-command)  
@@ -240,22 +242,29 @@ docker run -d -p 5000:5000 f-oh-data
 ```
 
 ### 需求背景
-目前由于远程服务器还存有清理问题，先将做好的demo应用放到本地的服务器上(部署到远程服务器上的本地)
-
+目前由于远程服务器还存有清理问题，先将做好的demo应用放到本地的服务器上(部署到远程服务器上的本地)  
+At present, since there are still cleanup issues on the remote server, first put the demo application on the local server (deploy it to the local on the remote server)
 ### 操作方法
 
 首先我们需要部署应用时我们需要修改的文件
 在Oniro的应用商城服务器中我们一共需要修改两个文件 `/data/`和 `allAppList.json`, 所以第一步就是要找到这两个文件在远程服务器中的位置
+First, we need to modify the files we need to deploy the application.   
+In Oniro's app store server, we need to modify two files in total: `/data/` and `allAppList.json`, so the first step is to find the location of these two files in the remote server.
 
-我们这里的远程服务器repo名字叫做`gowokegobroke/oniro-data`带有`TAG: latest`
+我们这里的远程服务器repo名字叫做`gowokegobroke/oniro-data`带有`TAG: latest`  
+Our remote server repo is called `gowokegobroke/oniro-data` with `TAG: latest`  
 
-要想获取远程服务器的文件路径，遵从以下docker命令
+要想获取远程服务器的文件路径，遵从以下docker命令  
+To get the file path of the remote server, follow the following docker command  
 
-首先进行ssh连接自己的服务器
+首先进行ssh连接自己的服务器  
+First, connect to your server through ssh  
 ```typescript
  ssh chen@80.158.63.151
 ```
-利用docker命令查看服务器上部署的`image`
+利用docker命令查看服务器上部署的`image`  
+Use the docker command to view the `image` deployed on the server  
+
 ```typescript
 docker image ls
 // REPOSITORY                 TAG       IMAGE ID       CREATED             SIZE
@@ -266,34 +275,41 @@ docker image ls
 // <none>                     <none>    7b36d96948f8   22 hours ago        1.01GB
 // gowokegobroke/oniro-data   latest    490f1e49f9da   6 months ago        1.17GB
 ```
-这里我们看到了需要找的`image`名字,先运行起来然后在容器中找到容器id再执行bash命令
+这里我们看到了需要找的`image`名字,先运行起来然后在容器中找到容器id再执行bash命令  
+Here we see the name of the `image` we need to find, run it first, then find the container id in the container and execute the bash command  
 
 ```typescript
-//运行想要的服务器
+//运行想要的服务器 Run the desired server
 docker run -d -p 5000:5000 f-oh-data
 
-//查看运行中的服务器在容器中的id
+//查看运行中的服务器在容器中的id View the id of the running server in the container
 docker container ls
 
-//找到id后替换下面id
+//找到id后替换下面id After finding the id, replace the following id
 docker exec -it 70cb78e186c8 bash
 ```
-现在我们找到了目标的文件路径
-
+现在我们找到了目标的文件路径  
+Now we have found the file path of the target  
 `data\`的路径：`/app/data/`  
 `appAppList.json`的路径：`/app/allAppList.json`  
+`data\` path: `/app/data/`
+`appAppList.json` path: `/app/allAppList.json`  
 
 记住这些路径 后面需要更新`Dockerfile`文件
+Remember these paths, you will need to update the `Dockerfile` file later  
 
-通过`scp`命令将本地app的hap文件传到自己的服务器文件中
+通过`scp`命令将本地app的hap文件传到自己的服务器文件中  
+Use the `scp` command to transfer the local app's hap file to your own server file  
 ```typescript
 scp C:\Users\c84381641\onBoarding\repos\appStore\f-oh-data\data\com.example.oniromathpunching\icon.png ssh chen@80.158.63.151:f-oh-data/data/com.example.oniromathpunching
 
 C:\Users\c84381641\onBoarding\repos\appStore\f-oh-data\data\com.example.oniromathpunching\oniromathpunchingv1.0.0.hap ssh chen@80.158.63.151:f-oh-data/data/com.example.oniromathpunching
 ```
-> 要先在自己的服务器中创建`data/com.example.oniromathpunching`目录
+> 要先在自己的服务器中创建`data/com.example.oniromathpunching`目录  
+> First, create the directory `data/com.example.oniromathpunching` in your server  
 
-在`allAppList.json`中也需要添加自己应用的相关配置信息如下：
+在`allAppList.json`中也需要添加自己应用的相关配置信息如下：  
+You also need to add the relevant configuration information of your application in `allAppList.json` as follows:  
 ```typescript
 {
     "id": 29,
@@ -311,25 +327,31 @@ C:\Users\c84381641\onBoarding\repos\appStore\f-oh-data\data\com.example.oniromat
 }
 ```
 
-上传完成后更新Dockerfile文件命令通过vi
+上传完成后更新Dockerfile文件命令通过vi  
+After uploading, update the Dockerfile file command through vi  
 ```typescript
 vi Dockerfile
 ```
-输入`i`进入`insert`模式，然后加入下面命令
+输入`i`进入`insert`模式，然后加入下面命令  
+Enter `i` to enter `insert` mode, then add the following command  
 ```typescript
 COPY allAppList.json /app/allAppList.json
 COPY data/ /app/data/
 ```
-最后把`container`中的image关掉通过docker stop id
+最后把`container`中的image关掉通过docker stop id  
+Finally, shut down the image in the container by using docker stop id  
 
-先`build`更新`f-oh-data`的image文件
+先`build`更新`f-oh-data`的image文件  
+First `build` update the `f-oh-data` image file  
 ```typescript
 docker build -t f-oh-data .
 ```
 
-再重新运行`f-oh-data`的image文件
+再重新运行`f-oh-data`的image文件  
+Re-run the `f-oh-data` image file  
 ```typescript
 docker run -d -p 5000:5000 f-oh-data
 ```
 
-问题解决
+问题解决  
+problem solved  

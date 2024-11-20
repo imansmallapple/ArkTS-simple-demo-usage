@@ -24,6 +24,9 @@ This part introduces the general process of the application development
 5. [Merge to applist and finish](#merge-to-applist-and-finish)
 ## UI Resources
 
+## Deploy
+[Deploy app to appStore](#deploy-app-to-appstore)
+
 We need 
 
 ### UI Design and Implement
@@ -220,3 +223,6 @@ the version and dependencies back as follows
 ```
 
 After that, run the `sync` operation again, the project should be working now.
+
+## Deploy app to appStore
+Please go to `docker.md` file and check detailed procedures.
