@@ -24,7 +24,7 @@
 2. [服务器数据无法渲染](#服务器数据无法渲染)
 3. [APP 无法实现安装下载](#app-无法实现安装下载)
 4. [需要获取服务器 http 码来进行 UI 判断](#需要获取服务器-http-码来进行-ui-判断)  
-5. [Hap signature fails to be verified](#hap-signature-fails-to-be-verified)
+5. [Hap signature fails to be verified](#hap-signature-fails-to-be-verified)  
 项目开发新增需求
 
 1. [网页加载过程中需要缓冲组件和连接失败页面](#网页加载过程中需要缓冲组件和连接失败页面)
@@ -1019,6 +1019,16 @@ git config --global user.email "youremail"
   - 6. 待审核人审核完毕结束
 
   ## Hap signature fails to be verified
+
+#### 问题描述
+在应用商城中安装自己编写的应用时失败：7700011 签名校验失败
+
+#### 解决方法
+- 发现自己应用的`build-profile.json`配置文件中的`signingConfigs`为空，点击项目右上角处的`project structure`选择自动生成签名文件后重新生成`hap`文件
+
+- 本地pc端测试之后发现问题解决
+
+- 找到新生成的`hap`文件之后替换到服务器断的对应的`hap`文件, 关于如何替换详情请看另一个文档`docker.md`
 
 #### 参考文档
 7700011 签名校验失败导致应用安装失败：  
