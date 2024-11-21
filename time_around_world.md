@@ -1,10 +1,25 @@
 # Time Around The World
+## Introduction
+
+`Time Around The World` shows the time of different timezone cities on `OpenHarmony` device.
 
 This is a documentation lists all the problems or noticeable thing during the app development.
 ### Table of content
-
+[Functionaility](#functionaility)  
 [Convert timestamp into regular time](#convert-timestamp-into-regular-time)
 [Delete certain city in time list](#delete-ertain-city-in-time-list)
+
+## Functionaility
+- two UI pages: Time Page and City Page
+
+    1. On the main screen displayed the current timezone's time.
+
+    2. User can click the '+' button to select a city and add it to the time page list.
+
+    3. Time also shown in list cities.
+    
+    4. Click `Edit` button will pop up a `Delete icon`, click this icon will remove the selected city from the list.
+
 ## Convert timestamp into regular time
 #### Project requirement
 We need to implement a function which can convert timestamp of certain timezone into the format of the time.
