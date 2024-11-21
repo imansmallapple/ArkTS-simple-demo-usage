@@ -1,13 +1,14 @@
 # Super Bright FlashLight
+## Introduction
 
-This is a documentation lists all the problems or noticeable thing during the app development.
+Super Bright FlashLight shows a simple demo of controlling flashlight on `OpenHarmony` device.
+
+This documentation also listed all the problems or noticeable thing during the app development.
 
 ### Table of content
+[Functionaility](#functionaility)  
 
-Application development general process
-
-1. [General Process](#general-process)
-2. [UI Resources](#ui-resources)
+ [General Process](#general-process)
 
 Problems encountered during development
 
@@ -21,13 +22,14 @@ This part introduces the general process of the application development
 2. [Logic and functionailities](#logic-and-functionailities)
 3. [Check and testing](#check-and-testing)
 4. [App display and acceptance](#app-display-and-acceptance)
-5. [Merge to applist and finish](#merge-to-applist-and-finish)
-## UI Resources
+5. [Add all necessary files](#add-all-necessary-files)
+6. [Merge to applist and finish](#merge-to-applist-and-finish)
 
-## Deploy
-[Deploy app to appStore](#deploy-app-to-appstore)
+## Functionaility
+    •  Provide a simple UI page with a slider. When we slide the bar to the top direction, the flashlight will goes brighter, vice versa.
 
-We need 
+    •  When we slide the bar, an `Off` button will pop up, click this button will reset the slider and turn off the flashlight.
+    
 
 ### UI Design and Implement
  - Take the example of `Super Bright FlashLight`, we are aiming to design the app with user-friendly interface. Comunicate with UI/UX colleague and got the basic construction idea.
@@ -125,9 +127,9 @@ So for this application I keep only simple demo with UI functionalities.
 CONTENT TO BE ADDED
 
 
-
-
-
+## Add all necessary files
+- Add LICENSE file
+We can add the `LICENSE` via [here](https://raw.githubusercontent.com/eclipse-oniro4openharmony/manifest/refs/heads/OpenHarmony-4.1-Release/LICENSE).
 
 ### Merge To Applist and Finish
 
@@ -227,5 +229,3 @@ the version and dependencies back as follows
 
 After that, run the `sync` operation again, the project should be working now.
 
-## Deploy app to appStore
-Please go to `docker.md` file and check detailed procedures.
