@@ -6,8 +6,13 @@
 This is a documentation lists all the problems or noticeable thing during the app development.
 ### Table of content
 [Functionaility](#functionaility)  
-[Convert timestamp into regular time](#convert-timestamp-into-regular-time)
-[Delete certain city in time list](#delete-ertain-city-in-time-list)
+[Convert timestamp into regular time](#convert-timestamp-into-regular-time)  
+[Delete certain city in time list](#delete-certain-city-in-time-list)  
+
+Problem faced during development  
+[main time rendered with delay](#main-time-rendered-with-delay)
+
+[Use list's onSelect method to trigger select event](#use-lists-onselect-method-to-trigger-select-event)
 
 ## Functionaility
 - two UI pages: Time Page and City Page
@@ -89,4 +94,58 @@ The idea is to use `list.splice` function, when we define the list using `ForEac
   }
   ```
 
-  
+  ## main time rendered with delay
+  #### Problem background
+  When I add a city to the time list, the main time and date(Current devices' timezone time and date) was rendered with some delay.
+
+  #### Related code
+  ```typescript
+Column() {
+  Text(`${this.convertedTime}`)
+    .fontSize(25)
+    .fontWeight(FontWeight.Bolder)
+  // TextClock({ timeZoneOffset: , controller: this.controller })
+
+  Text(`${this.timeZone}: ${this.convertedDate}`)
+    .fontSize(18)
+    .fontWeight(FontWeight.Lighter)
+}
+  ```
+
+  #### Reason Analyze
+  Since I used self-defined functions `convertedTime` and `convertedData`, so there might be a recalculation during the page changing.
+
+About `date`, my initial idea is to put the date into a variable within `AppStorage` scope, since date update is quite slow.
+
+Also, for the time in time list, I used the component with `Textclock`, which we have to provide timeZone's offset and a controller.
+```typescript
+TextClock({ timeZoneOffset: item.offset, controller: this.controller })
+```
+If we want to use `TextClock`, consider how to implement a function which can convert given `TimeZone`(This is simple, since we have an Api function called `GetTimeZone`) into its timeZoneOffset value.
+
+#### Solution
+- Put `convertedDate` into a variable using `AppStorage`
+- Instead implement a function which convert city's timezone string into it's offset value, just use `map` to find the offset which stored in our datesource.
+- Beside, since the `systemDateTime`'s `GetTimeZone` return timezone format is like `Asia/Shanghai`, we need to extract the city name using `split` method, another function was defined as follows.
+```typescript
+this.currentTimeZoneOffset = (this.getTimezoneOffsetByName(this.timeZone) as number) * -1
+
+
+  getTimezoneOffsetByName(systemTimeZone: string): number | null {
+    // Find the matching city based on the name
+    let name = this.extractRegion(systemTimeZone)
+    const city = supportedSystemTimezone.find(city => city.name === name);
+
+    // Return the offset if found, or null if not found
+    return city ? city.offset : null;
+  }
+
+    private extractRegion(timezone: string): string | null {
+    if (timezone.includes('/')) {
+      return timezone.split('/')[1]; // Return the part before the '/'
+    }
+    return null; // Return null if the format is invalid
+  }
+```
+
+## Use list's onSelect(()=>{}) method to trigger select event
