@@ -10,10 +10,15 @@ This is a documentation lists all the problems or noticeable thing during the ap
 [Delete certain city in time list](#delete-certain-city-in-time-list)  
 
 Problem faced during development  
-[main time rendered with delay](#main-time-rendered-with-delay)
+1. [main time rendered with delay](#main-time-rendered-with-delay)
 
-[Use list's onSelect method to trigger select event](#use-lists-onselect-method-to-trigger-select-event)
+2. [Use list's onSelect method to trigger select event](#use-lists-onselect-method-to-trigger-select-event)
 
+3. [Replace router into navigation](#replace-router-into-navigation)
+
+4. [How to filter required item by input part of the keyword](#how-to-filter-required-item-by-input-part-of-the-keyword)
+
+5. [Replace database with real world time api calls](#replace-database-with-real-world-time-api-calls)
 ## Functionaility
 - two UI pages: Time Page and City Page
 
@@ -149,3 +154,127 @@ this.currentTimeZoneOffset = (this.getTimezoneOffsetByName(this.timeZone) as num
 ```
 
 ## Use list's onSelect(()=>{}) method to trigger select event
+
+
+## Replace router into navigation
+#### Problem description
+In order to have a formal way of developement, we need to use `Navigation` rather than `router`. 
+
+#### Solution
+本例子中有两个页面带有参数传递
+
+Index 页面
+```typescript
+@Entry
+@Component
+struct Index {
+  pathStack: NavPathStack = new NavPathStack()
+  
+  @Builder
+  PagesMap(name: string) {
+    if (name == 'Index') {
+      Index()
+    } else if (name == 'ListPage') {
+      ListPage()
+    }
+  }
+
+  build(){
+    Navigation(this.pathStack) {
+    Button('+')
+      .zIndex(1)
+      .onClick(() => {
+        let tmp!: City
+        //We need to define onPop callback function for receiving data
+        this.pathStack.pushPathByName('ListPage', tmp, (popInfo) => {
+          let city = popInfo.result as City
+          this.message = city.name
+          this.cityList.push(city)
+        }); // Push the navigation destination page specified by name, with the data specified by param, to the navigation stack. Use the onPop callback to receive the page processing result.
+      })
+    }
+    .mode(NavigationMode.Stack)
+    .titleMode(NavigationTitleMode.Mini)
+    .title('Clock')
+    .navDestination(this.PagesMap)
+    .hideBackButton(true)
+  }
+}
+```
+
+```typescript
+@Entry
+@Component
+export struct ListPage {
+  pathStack: NavPathStack = new NavPathStack()
+
+  build() {
+    NavDestination() {
+      Scroll() {
+        Column() {
+          ListItem() {
+            Row() {
+              Text(item.timezone)
+                .margin(10)
+                .fontSize(20)
+
+              Text(item.name)
+                .margin(10)
+                .fontSize(20)
+
+              Text(item.offset.toString())
+                .margin(10)
+                .fontSize(20)
+            }
+            .margin(5)
+            .width('95%')
+            .height('20%')
+            .borderRadius(20)
+            .backgroundColor('#f6f6f6')
+          }
+          .onClick(() => {
+            this.pathStack.pop(item); // Return to the previous page and pass in the processing result to the onPop callback of push.
+          })
+        }
+        .layoutWeight(1)
+      }
+    }
+    .title('ListPage')
+    .onReady((context: NavDestinationContext) => {
+      this.pathStack = context.pathStack
+    })
+  }
+}
+```
+
+## How to filter required item by input part of the keyword
+#### Problem background
+After the search bar implementation, we need to filter the search result according to the database.
+
+#### Solution
+The idea is using array's filter method, the city have such interface:
+
+```typescript
+interface City {
+  name: string;
+  timezone: string;
+  offset: number;
+}
+```
+
+```typescript
+const filteredCity = supportedSystemTimezone.filter((city: City) => {
+  return city.name.toLowerCase().includes(value.toLowerCase())
+    || city.timezone.toLowerCase().includes(value.toLowerCase())
+});
+```
+As a result, we can return the searched result by the city's name or timezone.
+
+## Replace database with real world time api calls
+#### Problem background
+We need to make more sensible applications, so there should be enough city for user to select rather than fixed a few cities listed in the database.
+
+#### Solution
+For the solution I take a reference of F-OH project's idea.
+- Found world time api's url: `http://worldtimeapi.org/api/`
+
