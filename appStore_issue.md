@@ -20,11 +20,12 @@
 
 实机测试发现的问题
 
-1. [Web 组件无法通过参数渲染](#web组件无法通过参数渲染)
+1. [Web 组件无法通过参数渲染](#web-组件无法通过参数渲染)
 2. [服务器数据无法渲染](#服务器数据无法渲染)
 3. [APP 无法实现安装下载](#app-无法实现安装下载)
 4. [需要获取服务器 http 码来进行 UI 判断](#需要获取服务器-http-码来进行-ui-判断)  
 5. [Hap signature fails to be verified](#hap-signature-fails-to-be-verified)  
+
 项目开发新增需求
 
 1. [网页加载过程中需要缓冲组件和连接失败页面](#网页加载过程中需要缓冲组件和连接失败页面)
@@ -1033,3 +1034,89 @@ git config --global user.email "youremail"
 #### 参考文档
 7700011 签名校验失败导致应用安装失败：  
   https://docs.openharmony.cn/pages/v4.1/zh-cn/application-dev/reference/apis-ability-kit/errorcode-bundle.md
+
+  ## 添加无法连接到服务器的UI
+<img src='appStore_image/problem_12.png' width="600">
+
+## 添加应用开始动画
+```typescript
+import router from '@ohos.router';
+
+@Entry
+@Component
+struct SplashPage {
+  @State flag: boolean = false;
+
+  onPageShow(): void {
+    animateTo({
+      duration: 2000,
+      onFinish:()=>{
+        //when the animation finish go the main page
+        setTimeout(()=>{
+          router.replaceUrl({url: 'pages/Index'})
+        }, 200)
+      }
+    }, () => {
+      this.flag = true
+    })
+  }
+
+  build() {
+    Column() {
+      if (this.flag) {
+        Image($r('app.media.ONIRO'))
+          .logoStyle()
+          .transition({
+            type: TransitionType.Insert,
+            opacity: 0,
+            translate: { x: -150 },
+            scale:{
+              x:5,
+              y:5
+            }
+          })
+        Text($r('app.string.oniro_appStore'))
+          .titleStyle()
+          .transition({
+            type: TransitionType.Insert,
+            opacity: 0,
+            translate: { x: 150 }
+          })
+      }
+      Blank()
+    }
+    .bgStyle()
+  }
+}
+
+@Extend(Image)
+function logoStyle() {
+  .width(90)
+  .height(90)
+  .margin({ top: 120 })
+}
+
+@Extend(Text)
+function titleStyle() {
+  .fontSize(21)
+  .fontColor(Color.Black)
+  .fontWeight(FontWeight.Bold)
+  .margin({ top: 15 })
+}
+
+@Styles
+function bgStyle() {
+  .width('100%')
+  .height('100%')
+  .backgroundColor(Color.White)
+  .backgroundImageSize({ width: '100%', height: '100%' })
+}
+
+@Extend(Text)
+function footerStyle() {
+  .fontSize(12)
+  .fontColor('#ff7ba416')
+  .fontWeight(FontWeight.Bold)
+  .margin({ bottom: 30 })
+}
+```

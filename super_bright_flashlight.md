@@ -121,24 +121,9 @@ So for this application I keep only simple demo with UI functionalities.
 
 #### After remove api testing page, the real device rendered with blank page
 
-
-### App Display and Acceptance
-
-CONTENT TO BE ADDED
-
-
 ## Add all necessary files
 - Add LICENSE file
 We can add the `LICENSE` via [here](https://raw.githubusercontent.com/eclipse-oniro4openharmony/manifest/refs/heads/OpenHarmony-4.1-Release/LICENSE).
-
-### Merge To Applist and Finish
-
-CONTENT TO BE ADDED
-
-
-
-
-
 
 ## To run and debug the Harmony device configure the HarmonyOS runtime
 
