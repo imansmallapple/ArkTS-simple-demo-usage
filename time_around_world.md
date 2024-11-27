@@ -32,7 +32,7 @@ Problems faced after testing
 
 3. [Can not add the same city many times](#can-not-add-the-same-city-many-times)
 
-4. [Selected city should be marked](#selected-city-should-be-marked)
+4. [Selected city should be marked with √ label](#selected-city-should-be-marked-with-√-label)
 
 5. [Use persistentStorage-to-keep-selected-lists-info](#use-persistentstorage-to-keep-selected-lists-info)
 
@@ -334,7 +334,7 @@ https://ost.51cto.com/posts/11020
 
 ## Can not add the same city many times
 
-## Selected city should be marked
+## Selected city should be marked with √ label
 
 ## Use persistentStorage-to-keep-selected-lists-info
 
@@ -342,3 +342,4 @@ https://ost.51cto.com/posts/11020
 
 construct your app with @PersistentStorage:  
 https://blog.csdn.net/u013032788/article/details/138561443
+https://blog.csdn.net/priest44/article/details/139725812
