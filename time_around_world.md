@@ -36,6 +36,9 @@ Problems faced after testing
 
 5. [Use persistentStorage-to-keep-selected-lists-info](#use-persistentstorage-to-keep-selected-lists-info)
 
+Project detail improvement
+1. [Show list time status compared with current timezone time](#show-list-time-status-compared-with-current-timezone-time)
+
 ## Functionaility
 
 - two UI pages: Time Page and City Page
@@ -324,8 +327,148 @@ For the solution I take a reference of F-OH project's idea.
 - Found world time api's url: `http://worldtimeapi.org/api/`
 
 ## No default timezone setting instruction
+#### Problem background
+The default timezone is `Asia/Shanghai`, rather than `Europe/Warsaw`
 
+#### Resolution
+Inserted a sim card but the timezone is still the same.
+
+#### Conclusion
+Current device's system timezone can't be changed.
 ## Lists of Timezones should be sorted by Alphabet
+#### Problem background
+The city list items should be sorted somehow, so it's nice to have a Alphabet scroll bar.
+
+#### Resolution
+
+##### Layout main structure
+```typescript
+// 堆叠容器，方向居右
+Stack({ alignContent: Alignment.End }) {
+   // 列表布局   
+   Column() {
+        List() {
+          ......
+        }
+   }.width('100%')
+   .height('100%')
+       
+   // 字母索引导航
+   AlphabetIndexer()
+}
+```
+##### List item data format
+```typescript
+[
+    {
+      timezone: 'Africa',
+      name: 'Zanzibar',
+      offset: 3,
+      headerWord: 'Z'
+    },
+    {
+      timezone: 'Asia',
+      name: 'Shanghai',
+      offset: 8,
+      headerWord: 'S'
+    }
+]
+```
+
+##### List layout
+> **Attention:**  
+> Alphabet grouping effect: Display only one with the same character.
+
+```typescript
+// List data
+  @State unfilteredCities: City[] = supportedSystemTimezone
+// Scroller controller
+private scroller: Scroller = new Scroller()
+
+List({ scroller: this.scroller }) {
+  ForEach(this.unfilteredCities, (item: City, index: number) => {
+    ListItem() {
+      Column() {
+        // Alphabet layout
+        if (index == 0) {
+          // The 1st alphabet for sure to show
+          this.HeaderWord(item)
+        } else {
+          // Show if current character is not the same with previous one 
+          if (item.headerWord != this.unfilteredCities[index-1].headerWord) {
+            Text(item.headerWord)
+          }
+        }
+        // List content layout
+        Row() {
+          Text(item.name)
+            .margin(10)
+            .fontSize(20)
+
+          Text(item.offset.toString())
+            .margin(10)
+            .fontSize(20)
+      }
+    }
+  })
+}
+```
+
+##### Alphabet index navigation
+Obtains the map set corresponding to the letters and indexes in the list. The display condition of the letter layout is the same as that of the list.
+```typescript
+  private mapAlphabetsIndex(): Map<string, number> {
+    let mapAlphabetsIndex: Map<string, number> = new Map()
+
+    for (let i = 0; i < this.unfilteredCities.length; i++) {
+      const element = this.unfilteredCities[i];
+      // 第一个字母直接加入 Map
+      if (i === 0) {
+        mapAlphabetsIndex.set(element.headerWord, i);
+      } else {
+        // 如果当前字母和前一个字母不一样，则加入 Map
+        if (element.headerWord != this.unfilteredCities[i - 1].headerWord) {
+          mapAlphabetsIndex.set(element.headerWord, i);
+        }
+      }
+    }
+    return mapAlphabetsIndex;
+  }
+```
+```typescript
+private alphabets: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+@State private selectedIndex: number = 0
+// 字母索引导航
+AlphabetIndexer({ arrayValue: this.alphabets, selected: this.selectedIndex })
+  .onSelect((index: number) => {
+    // 选中的字母
+    const alphabet = this.alphabets[index];
+
+    // 调用 mapAlphabetsIndex，获取字母到索引的映射表
+    const mapIndex = this.mapAlphabetsIndex().get(alphabet);
+
+    if (mapIndex !== undefined) {
+      // 跳转到指定索引位置
+      this.scroller.scrollToIndex(mapIndex);
+      hilog.info(0x00, `Selected alphabet "${alphabet}" found in the map.`, `mapIndex:${mapIndex}`);
+
+    } else {
+      hilog.error(0x00, `Selected alphabet "${alphabet}" not found in the map.`, 'error');
+    }
+  })
+```
+
+##### Sliding the selected letter in the list
+```typescript
+List({ scroller: this.scroller }) {
+}
+.onScrollIndex((start, end) => {
+  // 监听滑动时顶部的索引，查询对应的数据
+  const element = this.unfilteredCities[start]
+  // 更新选中的字母索引
+  this.selectedIndex = this.alphabets.indexOf(element.headerWord)
+})
+```
 
 #### Reference material
 
@@ -333,13 +476,116 @@ ArkUI（TS）声明式开发：列表字母索引导航:
 https://ost.51cto.com/posts/11020
 
 ## Can not add the same city many times
+#### Problem backgorund
+We can add the same city to the list, which shouldn't be able to.
 
-## Selected city should be marked with √ label
+#### Solution
+
+##### Step 1
+We should use `PersistentStorage` to store the selected cities.
+
+Define the list outside, and use the variable inside the struct
+```typescript
+PersistentStorage.persistProp<string[]>('selectedCities', [])
+```
+
+```typescript
+@State private selectedIndex: number = 0
+```
+
+##### Step 2
+Inside `ForEach` loop of our list, we should check if current list exists in the selected list array.
+
+
+> **Tip**  
+> If the list item had been selected, we can add a small `√` label and prompt a widget to show some information.
+
+We can make the list item within a `if...else...` statement, if the list item had been selected, we should a selected style, otherwise when the list item is clicked, we push it into our selected list item array.
+
+```typescript
+ForEach(this.unfilteredCities, (item: City, index: number) => {
+  if(this.selectedCities.includes(item.name)) {
+    Row() {
+      Column() {
+        Text(item.name)
+          .margin(10)
+          .fontSize(20)
+        Text(`UTC${item.offset >= 0 ? '+' + item.offset.toString()
+          .padStart(2, '0') :
+          '-' + Math.abs(item.offset).toString().padStart(2, '0')}:00`)
+          .utcStyle()
+      }
+      .width(200)
+      .alignItems(HorizontalAlign.Start)
+      Text('√')
+    }
+    .rowStyle()
+    .onClick(() => {
+      promptAction.showToast({
+        message: 'The city was added to the list!'
+      })
+    })
+  }
+  else {
+      Row() {
+        Column() {
+          Text(item.name)
+            .margin(10)
+            .fontSize(20)
+          //Suplement UTC with correct format
+          Text(`UTC${item.offset >= 0 ? '+' + item.offset.toString()
+            .padStart(2, '0') :
+            '-' + Math.abs(item.offset).toString().padStart(2, '0')}:00`)
+            .utcStyle()
+        }
+        .width(200)
+        .alignItems(HorizontalAlign.Start)
+      }
+      .rowStyle()
+    }
+  }
+.onClick(() => {
+  if (!this.selectedCities.includes(item.name)) {
+    this.selectedCities.push(item.name);
+    this.pathStack.pop(item);
+  }
+})
+)
+```
 
 ## Use persistentStorage-to-keep-selected-lists-info
+#### Problem background
+We should have the selected city list on Index page, and when we kill the application, the data disappeared.
+
+#### Solution
+To solve this problem we need to use `PersisntentStorage`.
+
+To define it:
+```typescript
+PersistentStorage.persistProp<string[]>('selectedCities', [])
+```
+
+To use it:
+```typescript
+  @StorageLink('selectedCities') selectedCities: string[] = []
+```
+Via the `@StroageLink` decorator, we can get controll to the app data even after the app is killed.
 
 #### Reference material
 
-construct your app with @PersistentStorage:  
+construct your app with `@PersistentStorage`:  
 https://blog.csdn.net/u013032788/article/details/138561443
 https://blog.csdn.net/priest44/article/details/139725812
+
+## Show list time status compared with current timezone time
+
+#### Problem background
+When we add a city into our index page, there is no information about the difference between selected cities and current timezone's city, user might get confused.
+
+#### Solution
+```typescript
+Text(`UTC${item.offset >= 0 ? '+' + item.offset.toString()
+  .padStart(2, '0') :
+  '-' + Math.abs(item.offset).toString().padStart(2, '0')}:00`)
+  .utcStyle()
+```
