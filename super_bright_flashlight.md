@@ -211,6 +211,6 @@ the version and dependencies back as follows
     "@ohos/hvigor-ohos-plugin": "3.2.4"
   },
 ```
-
+  
 After that, run the `sync` operation again, the project should be working now.
 

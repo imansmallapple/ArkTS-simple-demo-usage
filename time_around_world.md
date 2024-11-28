@@ -22,7 +22,7 @@ Problem faced during development
 
 4. [How to filter required item by input part of the keyword](#how-to-filter-required-item-by-input-part-of-the-keyword)
 
-5. [Replace database with real world time api calls](#replace-database-with-real-world-time-api-calls)
+5. [Replace database with real world time api calls with LazyForEach list rendering](#replace-database-with-real-world-time-api-calls-with-lazyforeach-list-rendering)
 
 Problems faced after testing
 
@@ -314,17 +314,326 @@ const filteredCity = supportedSystemTimezone.filter((city: City) => {
 
 As a result, we can return the searched result by the city's name or timezone.
 
-## Replace database with real world time api calls
+## Replace database with real world time api calls with LazyForEach list rendering
 
 #### Problem background
 
-We need to make more sensible applications, so there should be enough city for user to select rather than fixed a few cities listed in the database.
+We need to make more sensible applications, so there should be enough city for user to select rather than fixed a few cities listed in the database.  
+> **Note:**  
+> For now we want quick app demo development so we keep the database as static array rather than api, but I still keep this note for future use/study.
+#### Resolution
 
-#### Solution
-
-For the solution I take a reference of F-OH project's idea.
+For most of the solution I take a reference of F-OH project's idea.
 
 - Found world time api's url: `http://worldtimeapi.org/api/`
+
+##### Implement `BasicDataSource` and `MyDataSource`
+> Note that `City`'s entities must match with api call's data format
+
+```typescript
+export interface City {
+  name: string;
+  timezone: string;
+}
+// Basic implementation of IDataSource to handle data listener
+class BasicDataSource implements IDataSource {
+  private listeners: DataChangeListener[] = [];
+  private originDataArray: City[] = [];
+
+  public totalCount(): number {
+    return 0;
+  }
+
+  public getData(index: number): City {
+    return this.originDataArray[index];
+  }
+
+  // 该方法为框架侧调用，为LazyForEach组件向其数据源处添加listener监听
+  registerDataChangeListener(listener: DataChangeListener): void {
+    if (this.listeners.indexOf(listener) < 0) {
+      console.info('add listener');
+      this.listeners.push(listener);
+    }
+  }
+
+  // 该方法为框架侧调用，为对应的LazyForEach组件在数据源处去除listener监听
+  unregisterDataChangeListener(listener: DataChangeListener): void {
+    const pos = this.listeners.indexOf(listener);
+    if (pos >= 0) {
+      console.info('remove listener');
+      this.listeners.splice(pos, 1);
+    }
+  }
+
+  // 通知LazyForEach组件需要重载所有子组件
+  notifyDataReload(): void {
+    this.listeners.forEach(listener => {
+      listener.onDataReloaded();
+    })
+  }
+
+  // 通知LazyForEach组件需要在index对应索引处添加子组件
+  notifyDataAdd(index: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataAdd(index);
+    })
+  }
+
+  // 通知LazyForEach组件在index对应索引处数据有变化，需要重建该子组件
+  notifyDataChange(index: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataChange(index);
+    })
+  }
+
+  // 通知LazyForEach组件需要在index对应索引处删除该子组件
+  notifyDataDelete(index: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataDelete(index);
+    })
+  }
+
+  // 通知LazyForEach组件将from索引和to索引处的子组件进行交换
+  notifyDataMove(from: number, to: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataMove(from, to);
+    })
+  }
+}
+```
+```typescript
+export class MyDataSource extends BasicDataSource {
+  private dataArray = []
+
+  public totalCount(): number {
+    return this.dataArray.length;
+  }
+
+  public getData(index: number): City {
+    return this.dataArray[index];
+  }
+
+  public addData(index: number, data: City): void {
+    this.dataArray.splice(index, 0, data);
+    this.notifyDataAdd(index);
+  }
+
+  public pushData(data: City): void {
+    this.dataArray.push(data);
+    this.notifyDataAdd(this.dataArray.length - 1);
+  }
+}
+```
+
+##### Write ds_server with api calls
+the `Get` request to the following api url gives result like   
+
+["Africa/Abidjan",
+  "Africa/Accra",
+  "Africa/Addis_Ababa"],  
+The `getAllTimeZone` splite the city name and timezone into 2 parts and save it into our defined `City` interface.
+
+The `getTimeZoneTime` gives back input `timezone` with it's `current time`
+
+The `fetchHttpCode` is a tool to check the server's connection
+
+```typescript
+const api_timezone: string = "https://www.timeapi.io/api/timezone/availabletimezones";
+
+class ds_server {
+  public static allCityList: City[] = [];
+
+  static getAllTimeZone(success: Function, error?: Function) {
+    let httpRequest = http.createHttp();
+    httpRequest.request(api_timezone, {
+      method: http.RequestMethod.GET
+    }, (err, data) => {
+      if (!err && data.responseCode == 200) {
+        // 将 JSON 字符串转为数组
+        let dataArr = JSON.parse(data.result as string) as string[];
+        dataArr.map((item) => {
+          const parts = item.split("/");
+          const name = parts[1] || parts[0];
+          DataSource.allCityList.push({
+            name: name,
+            timezone: item
+          });
+        });
+        // 调用成功回调函数
+        success(DataSource.allCityList, dataArr.length);
+      } else {
+        httpRequest.destroy();
+      }
+    });
+  }
+
+  static getTimeZoneTime(timezone: string, success: (time: string) => void, error?: (err: Error) => void) {
+    let httpRequest = http.createHttp();
+    let timezoneInfo = parseTimeZone(timezone)
+    let api_timezone_time: string = `https://www.timeapi.io/api/time/current/zone?timeZone=${timezoneInfo.timezone}%2F${timezoneInfo.name}`
+
+    httpRequest.request(api_timezone_time, {
+      method: http.RequestMethod.GET
+    }, (err, data) => {
+      if (!err && data.responseCode == 200) {
+        try {
+          // Parse the JSON response as a TimeZoneResponse
+          const response: TimeZoneResponse = JSON.parse(data.result as string);
+
+          // Extract the `time` field
+          const time = response.time;
+
+          // Call the success callback with the extracted time
+          success(time);
+        } catch (parseError) {
+          console.error("Error parsing response:", parseError);
+          if (error) error(parseError as Error);
+        }
+      } else {
+        console.error("HTTP request failed:", err);
+        if (error) error(err as Error);
+      }
+    });
+  }
+
+  async fetchHttpCode(): Promise<number> {
+    try {
+      let httpRequest = http.createHttp();
+      const response = await new Promise<number>((resolve, reject) => {
+        httpRequest.request(api_timezone, (err: Error, data: http.HttpResponse) => {
+          if (!err) {
+            resolve(data.responseCode);
+          } else {
+            reject(err);
+          }
+        });
+      });
+      return response; // 返回响应码
+    } catch (error) {
+      console.error('Error fetching HTTP code:', error);
+      return -1; // 返回一个错误码
+    }
+  }
+}
+
+export { ds_server, api_timezone }
+```
+
+##### Initialize the list in listPage
+We need to create a local page's list, and we can initalize it in `aboutToAppear`  
+
+> The most **important** step is to push the data into `dataSet` in `aboutToAppear`
+```typescript
+@Entry
+@Component
+export struct ListPage {
+@State unfilteredCities: City[] = []
+@State dataSet: MyDataSource = new MyDataSource()
+scroller: Scroller = new Scroller()
+
+  aboutToAppear(): void {
+    const source = new DataSource()
+    source.fetchHttpCode().then((code) => {
+      this.httpCode = code; // 更新状态变量以触发 UI 的重新渲染
+      if (code == 200) {
+        DataSource.getAllTimeZone((data: City[]) => {
+          this.unfilteredCities = data;
+          //Push data into datasource
+          for (let index = 0; index < data.length; index++) {
+            this.dataSet.pushData(data[index])
+          }
+        }, () => {
+        })
+      }
+    });
+  }
+}
+```
+##### Use `LazyForEach` render list
+```typescript
+ List({ scroller: this.scroller }) {
+              LazyForEach(this.dataSet, (item: City, index: number) => {
+                ListItem() {
+                  Column() {
+                    if (index == 0) {
+                      // 第一个肯定要显示
+                      Text(item.name[0])
+                    } else {
+                      // 当前字母和前一个不一样就显示
+                      if (item.name[0] != this.unfilteredCities[index-1].name[0]) {
+                        Text(item.name[0])
+                      }
+                    }
+                    if (this.selectedCities.includes(item.name)) {
+                      Row() {
+                        Column() {
+                          Text(item.name)
+                            .margin(10)
+                            .fontSize(20)
+                          // Text(`UTC${item.offset >= 0 ? '+' + item.offset.toString()
+                          //   .padStart(2, '0') :
+                          //   '-' + Math.abs(item.offset).toString().padStart(2, '0')}:00`)
+                          //   .utcStyle()
+                        }
+                        .width(200)
+                        .alignItems(HorizontalAlign.Start)
+
+                        Text('√')
+                      }
+                      .rowStyle()
+                      .onClick(() => {
+                        promptAction.showToast({
+                          message: 'The city was added to the list!'
+                        })
+                      })
+                    }
+                    else {
+                      Row() {
+                        Column() {
+                          Text(item.name)
+                            .margin(10)
+                            .fontSize(20)
+                          //Suplement UTC with correct format
+                          // Text(`UTC${item.offset >= 0 ? '+' + item.offset.toString()
+                          //   .padStart(2, '0') :
+                          //   '-' + Math.abs(item.offset).toString().padStart(2, '0')}:00`)
+                          //   .utcStyle()
+                        }
+                        .width(200)
+                        .alignItems(HorizontalAlign.Start)
+                      }
+                      .rowStyle()
+                    }
+                  }
+                }
+                .onClick(() => {
+                  //todo: logic not so correct
+                  // if (!this.selectedCities.includes(item.name)) {
+                  //   this.selectedCities.push(item.name);
+
+                    for (let index: number = 0; index < this.cityList.length; index++) {
+                      DataSource.getTimeZoneTime(this.cityList[index].timezone, (time: string) => {
+                        console.log(`Time in Europe/Amsterdam: ${time}`);
+                        this.cityTimeList[index] = time;
+                      },
+                        (err: Error) => {
+                          console.error('Error fetching time for Europe/Amsterdam:', err);
+                        })
+                    }
+
+                    this.pathStack.pop(item);
+                  // }
+                })
+              })
+            }
+            .onScrollIndex((start, end) => {
+              // 监听滑动时顶部的索引，查询对应的数据
+              const element = this.unfilteredCities[start]
+              // 更新选中的字母索引
+              this.selectedIndex = this.alphabets.indexOf(element.name[0])
+            })
+```
+
 
 ## No default timezone setting instruction
 #### Problem background
@@ -386,28 +695,19 @@ Stack({ alignContent: Alignment.End }) {
 private scroller: Scroller = new Scroller()
 
 List({ scroller: this.scroller }) {
-  ForEach(this.unfilteredCities, (item: City, index: number) => {
+  LazyForEach(this.dataSet, (item: City, index: number) => {
     ListItem() {
-      Column() {
-        // Alphabet layout
-        if (index == 0) {
-          // The 1st alphabet for sure to show
-          this.HeaderWord(item)
-        } else {
-          // Show if current character is not the same with previous one 
-          if (item.headerWord != this.unfilteredCities[index-1].headerWord) {
-            Text(item.headerWord)
-          }
-        }
-        // List content layout
-        Row() {
-          Text(item.name)
-            .margin(10)
-            .fontSize(20)
+        Column() {
+          // List content layout
+          Row() {
+            Text(item.timezone)
+              .margin(10)
+              .fontSize(20)
 
-          Text(item.offset.toString())
-            .margin(10)
-            .fontSize(20)
+            Text(item.name)
+              .margin(10)
+              .fontSize(20)
+        }
       }
     }
   })
