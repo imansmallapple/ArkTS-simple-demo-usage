@@ -22,7 +22,7 @@ hdc -t <your device id> shell mkdir -p data/local/tmp/soundcloud-demo
 
 hdc -t <your device id> file send <path-to>/soundcloud-demo-0.1.0.tar /data/local/tmp/soundcloud-demo
 
-5. Unpack the tarball
+5. Unpack the tarball(unecessary step)
 
 hdc -t <your device id> shell tar -xvf /data/local/tmp/soundcloud-demo/soundcloud-demo-0.1.0.tar -C /data/local/tmp/soundcloud-demo/
 
@@ -58,7 +58,7 @@ hdc -t <your device id> shell mkdir -p data/local/tmp/telegram-demo
 
 hdc -t <your device id> file send <path-to>telegram-demo-0.2.0.tar /data/local/tmp/telegram-demo
 
-5. Unpack the tarball
+5. Unpack the tarball(unecessary step)
 
 hdc -t <your device id> shell tar -xvf /data/local/tmp/telegram-demo/telegram-demo-0.2.0.tar -C /data/local/tmp/telegram-demo/
 
