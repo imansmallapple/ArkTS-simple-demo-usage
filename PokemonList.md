@@ -5,10 +5,10 @@
 
 
 ## Overview
-![Alt text](PokeImage/image_1.png)
-![Alt text](PokeImage/image_2.png)
-![Alt text](PokeImage/image_3.png)
-![Alt text](PokeImage/image_4.png)
+![Alt text](images/PokeImage/image_1.png)
+![Alt text](images/PokeImage/image_2.png)
+![Alt text](images/PokeImage/image_3.png)
+![Alt text](images/PokeImage/image_4.png)
 
 This is a documentation lists all the problems or noticeable thing during the app development.
 ### Table of content
