@@ -4,7 +4,7 @@ This repo listed all kinds of git operation during my work.
 [git拆分历史一个commit为多个次commit](#git拆分历史一个commit为多个次commit)  
 [git修改历史一个commit的提交记录和历史代码](#git修改历史一个commit的提交记录和历史代码)  
 [git更安全地强制推送本地仓库代码](#git更安全地强制推送本地仓库代码)  
-[修改Git提交历史中的author，email和name等信息](#修改git提交历史中的authoremail和name等信息)
+[修改Git提交历史中的author，email和name等信息](#修改git提交历史中的authoremail和name等信息)  
 [如何修改git的第一次提交信息](#如何修改git的第一次提交信息)
 
 ## git合并历史多个commits
