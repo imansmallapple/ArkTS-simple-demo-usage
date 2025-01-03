@@ -355,3 +355,9 @@ docker run -d -p 5000:5000 f-oh-data
 
 问题解决  
 problem solved  
+从电脑传文件到自己的远程端
+![Alt text](docker/docker_4.png)
+
+从自己的远程端传到docker image的话用docker cp
+![Alt text](docker/docker_5.png)
+![Alt text](docker/docker_6.png)
