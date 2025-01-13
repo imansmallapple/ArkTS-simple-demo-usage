@@ -558,5 +558,47 @@
         "tags": "Quotes, Inspirational",
         "openSourceAddress": "https://github.com/eclipse-oniro4openharmony/app-QuoteOfTheDay",
         "releaseTime": "2024-12-15"
+    },
+    {
+        "id": 40,
+        "name": "Workout Logbook",
+        "desc": "Workout Logbook app is designed to help users easily record and manage their daily exercise",
+        "icon": "/data/com.example.workoutlogbook/icon.png",
+        "vender": "Chen",
+        "packageName": "com.example.workoutlogbook",
+        "version": "1.0.0",
+        "hapUrl": "/data/com.example.workoutlogbook/workoutlogbook-v1.0.0.hap",
+        "type": "app",
+        "tags": "Health, Utility",
+        "openSourceAddress": "https://github.com/eclipse-oniro4openharmony/app-WorkoutLogbook",
+        "releaseTime": "2025-01-09"
+    },
+    {
+        "id": 41,
+        "name": "PlayScout",
+        "desc": "Explore and download free games effortlessly",
+        "icon": "/data/com.example.playscout/icon.png",
+        "vender": "Chen",
+        "packageName": "com.example.playscout",
+        "version": "1.0.0",
+        "hapUrl": "/data/com.example.playscout/playscout-v1.0.0.hap",
+        "type": "app",
+        "tags": "Game Store, Information",
+        "openSourceAddress": "https://github.com/eclipse-oniro4openharmony/app-PlayScout",
+        "releaseTime": "2025-01-09"
+    },
+    {
+        "id": 42,
+        "name": "My List",
+        "desc": "MyList is application to list the items in case forgetting to buy or to take",
+        "icon": "/data/com.example.mylist/icon.png",
+        "vender": "Roxy",
+        "packageName": "com.example.mylist",
+        "version": "1.0.0",
+        "hapUrl": "/data/com.example.mylist/mylist-v1.0.0.hap",
+        "type": "app",
+        "tags": "Utility, Shopping List",
+        "openSourceAddress": "https://github.com/eclipse-oniro4openharmony/app-MyList",
+        "releaseTime": "2025-12-15"
     }
 ]
