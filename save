@@ -1,0 +1,96 @@
+#### Task list
+1. merge brach f-oh
+2. add math app to remote server
+3. write super strong flashlight app
+4. download 2 apps on Pura 70 which has the HMOS NEXT OS
+
+5. 在appstore的docker本地服务器上添加自己的math app，
+全程使用docker command并且要使用远程命令(自己作为一个远程服务器的一个本地映射
+，每次做出更改之后Build image的时候要先把之前的image去掉然后重新运行新的docker image)
+具体命令可以通过history查看学习
+先通过ssh@Chen之类的命令连接到远程服务器上自己的账户，然后再一点点操作
+
+
+###加上math app，就这样 locally然后是
+
+
+OSDB API KEY
+rWGRSRHmuzw9hqyZr5Z6y
+
+#### 组会整理
+10/1 - 10/17（10/1 - 10/7:First time modification 10/8 - 10/16: Review again and second update =>Merge to docs）
+Help with completing oniro onboarding documentation
+Learning arkTS programming language
+10/17
+Using Jekyll deploy onboarding documentation on oniro website
+
+10/18 - 10/25
+Started first mobile app demo: math punching application
+
+10/26 - 10/28
+ArkTS demo study(Making notes for future use)
+
+10/29 - 11/12
+Started F-OH API migration(From API 9 to API 11)
+Deploy project server locally using docker
+
+11/13 - 11/20
+Started super flash light mobile app
+
+11/20 - 11/28
+Still Time around world mobile app
+11/25-添加Time api， 添加 Search bar, super flash light 测试完成
+11/26- 根据测试同事的要求对项目进行修改：基本完善
+11/27- App问题修改完成， 第二次测试， 补充app文档（选择第三个app）
+11/28- 尝试添加Api，新增带有Api数据的git分支，选择第三个app WorkoutLogbook 项目初始化
+
+11/28 组会内容:
+There are about 5 apps about to finish and some of them still under testing or fixing tester suggested problems.
+I had one finished, one still under testing and is going to take the 3rd app to develop today.
+
+1/8
+- Finished App-PlayScout to be added -- didn't pass CI testing yet
+
+- Restructured the oniro docs project directories
+
+- Started job about port applications to api 11
+
+Works fine:
+App-GuessNumber, App-PokemonList, App-TimeAroundWorld, App-Magic8Ball  App-WaterTracker, App-UnitConverter, App-Superflashlight(fixed: bundle-name issue), App-ThrowTheDice(fixed: bundle-name issue) works fine (PR made)
+
+Small issue:
+App-Bmi Calculator downloaded from oniro Appstore don't have icon displayed (PR made)
+
+
+App-QuoteOfTheDay can't be open from oniro Appstore(but can be download) (PR made)
+
+
+Big issue:
+App-Pinwheel can't be download from oniro Appstore (PR made)
+
+Not started:
+App-MyList
+
+
+Not made:
+Make PR for F-OH-DATA to update all recently apps into oniro Appstore
+
+
+####Openai key
+
+Francesco's token:
+
+organization id: 
+org-ydMzUkGjJgaJ2hFz4SeFr8FO
+
+newsApi key:
+4fba4607df974f7e8cfd1883c0f19ea5
+
+
+GitHub version's chatgpt api key:
+授权成功
+您的免费API Key为: sk-wJc5pQkW0ZKz9gP1ITTSAxxNoH27Ri50lA4IaRFqL69KxOZs
+请妥善保管，不要泄露给他人，如泄漏造成滥用可能会导致Key被封禁
+
+
+ curl https://api.chatanywhere.org/v1/chat/completions \ -H 'Content-Type: application/json' \ -H 'Authorization: Bearer sk-wJc5pQkW0ZKz9gP1ITTSAxxNoH27Ri50lA4IaRFqL69KxOZs' \ -d '{ "model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": "Say this is a test!"}], "temperature": 0.7 }'
