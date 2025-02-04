@@ -1,10 +1,10 @@
 #### Table of Content
 
-[Api with Header and auth](#api-with-header-and-auth)
-[Api Post method](#api-post-method)
-[Strong console output with JSON format](#strong-console-output-with-json-format)
-[Keyboard hiding input](#keyboard-hiding-input)
-[Input image resource from user](#input-image-resource-from-user)
+[Api with Header and auth](#api-with-header-and-auth)  
+[Api Post method](#api-post-method)  
+[Strong console output with JSON format](#strong-console-output-with-json-format)  
+[Keyboard hiding input](#keyboard-hiding-input)  
+[Input image resource from user](#input-image-resource-from-user)  
 #### Api with Header and Auth
 Some application's api requires authenication, thus the api request format is a bit different than before.
 
