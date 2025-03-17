@@ -32,6 +32,11 @@ sudo cp flash/etc/udev/rules.d/85-rk3568.rules /etc/udev/rules.d/85-rk3568.rules
 udevadm control --reload-rules
 ```
 - After this setup, running flash/flash.py -q should produce the following output, indicating readiness:(检查输出)
+
+>Note:
+If you want to implement it through WSL, you need to attach USB devices to virtual Ubuntu, and follow the procedure with the link instruction from `Attach a USB device`:
+https://learn.microsoft.com/en-us/windows/wsl/connect-usb
+
 ```bash
 maskrom
 ```
