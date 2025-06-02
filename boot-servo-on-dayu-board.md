@@ -8,13 +8,21 @@ The emulator requires **QEMU** to be installed on your system.
 - Download and install QEMU from the official website:  
   [https://www.qemu.org/download/](https://www.qemu.org/download/)
 
-
+- Open MSYS2 terminal and install QEMU image by following command:
+```bash
+# For 64 bit Windows 8.1 or above (in UCRT64):
+pacman -S mingw-w64-ucrt-x86_64-qemu
+```
 
 Refer to the platform-specific instructions on the QEMU website for installation details.
 
 2. ### Running the Emulator
 
 To start the emulator, use the appropriate script for your operating system:
+
+```bash
+ cd oniro_emulator/images
+```
 
 - **Linux:**  
   ```bash
@@ -23,6 +31,7 @@ To start the emulator, use the appropriate script for your operating system:
 注意这里要配置qemu的环境变量
 - **Windows:**  
   ```powershell
+  # C:\Users\chens\Desktop\oniro_emulator\images>.\run.bat
   .\run.bat
   ```
 如果.\run.bat有问题

@@ -40,7 +40,7 @@ To install on a device using hdc do the following.
 
 1. Locate where the hdc tool on your system.
 
-(For Windows with DevEcoStudio installed, you will find it at C:\Users\<your-account>\AppData\Local\OpenHarmony\Sdk\11\toolchains>
+For Windows with DevEcoStudio installed, you will find it at C:\Users\<your-account>\AppData\Local\OpenHarmony\Sdk\11\toolchains>
 
 The rest of these steps assume that you have this directory in your path or you run hdc from this path.
 
